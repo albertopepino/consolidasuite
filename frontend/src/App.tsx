@@ -9,6 +9,12 @@ import { SettingsPage } from '@/pages/SettingsPage';
 import { FinancialStatementsPage } from '@/pages/FinancialStatementsPage';
 import { TargetsPage } from '@/pages/TargetsPage';
 import { ChartOfAccountsPage } from '@/pages/ChartOfAccountsPage';
+import { HRPage } from '@/pages/HRPage';
+import { IntercompanyPage } from '@/pages/IntercompanyPage';
+import { AssetsPage } from '@/pages/AssetsPage';
+import { TaxPage } from '@/pages/TaxPage';
+import { TreasuryPage } from '@/pages/TreasuryPage';
+import { LegalPage } from '@/pages/LegalPage';
 
 export default function App() {
   return (
@@ -44,6 +50,12 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/hr" element={<HRPage />} />
+        <Route path="/intercompany" element={<IntercompanyPage />} />
+        <Route path="/assets" element={<AssetsPage />} />
+        <Route path="/tax" element={<TaxPage />} />
+        <Route path="/treasury" element={<TreasuryPage />} />
+        <Route path="/legal" element={<LegalPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
 

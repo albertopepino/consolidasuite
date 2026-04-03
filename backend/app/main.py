@@ -10,7 +10,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from sqlalchemy import text
 
-from app.api.routes import auth, budget, chart_of_accounts, dashboard, financial_data, kpis, sites, targets, upload
+from app.api.routes import auth, budget, chart_of_accounts, dashboard, financial_data, fixed_assets, hr, intercompany, kpis, legal_entity, sites, targets, tax, treasury, upload
 from app.config import settings
 from app.database import engine
 
@@ -102,6 +102,12 @@ app.include_router(budget.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
 app.include_router(targets.router, prefix="/api")
 app.include_router(chart_of_accounts.router, prefix="/api")
+app.include_router(hr.router, prefix="/api")
+app.include_router(intercompany.router, prefix="/api")
+app.include_router(fixed_assets.router, prefix="/api")
+app.include_router(tax.router, prefix="/api")
+app.include_router(treasury.router, prefix="/api")
+app.include_router(legal_entity.router, prefix="/api")
 
 
 # ---------------------------------------------------------------------------

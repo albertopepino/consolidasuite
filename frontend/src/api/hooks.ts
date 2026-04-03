@@ -409,3 +409,133 @@ export function useUploadSiteCoA() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['chart-of-accounts'] }); },
   });
 }
+
+// ─── HR & Payroll ──────────────────────────────────────────────────────────
+
+export function useDepartments(siteId: string) {
+  return useQuery({
+    queryKey: ['hr', 'departments', siteId],
+    queryFn: () => apiClient.get<{items: any[], total: number}>(`/hr/departments/${siteId}`),
+    enabled: !!siteId,
+  });
+}
+
+export function useEmployees(siteId: string) {
+  return useQuery({
+    queryKey: ['hr', 'employees', siteId],
+    queryFn: () => apiClient.get<{items: any[], total: number}>(`/hr/employees/${siteId}`),
+    enabled: !!siteId,
+  });
+}
+
+export function useHeadcount(siteId: string | null) {
+  return useQuery({
+    queryKey: ['hr', 'headcount', siteId],
+    queryFn: () => siteId
+      ? apiClient.get<any>(`/hr/headcount/${siteId}`)
+      : apiClient.get<any>('/hr/headcount/consolidated'),
+  });
+}
+
+export function usePayroll(siteId: string | null, year: number, month: number) {
+  return useQuery({
+    queryKey: ['hr', 'payroll', siteId, year, month],
+    queryFn: () => siteId
+      ? apiClient.get<any>(`/hr/payroll/${siteId}?year=${year}&month=${month}`)
+      : apiClient.get<any>(`/hr/payroll/consolidated?year=${year}&month=${month}`),
+  });
+}
+
+export function useUploadSalaries() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: {siteId: string; file: File}) => {
+      const fd = new FormData();
+      fd.append('file', data.file);
+      return apiClient.upload<any>(`/hr/salaries/upload/${data.siteId}`, fd);
+    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['hr'] }); },
+  });
+}
+
+// ─── Intercompany ─────────────────────────────────────────────────────────
+export function useICInvoices(siteId?: string, status?: string) {
+  return useQuery({
+    queryKey: ['ic', 'invoices', siteId, status],
+    queryFn: () => {
+      const p: Record<string,string> = {};
+      if (siteId) p.site_id = siteId;
+      if (status) p.status = status;
+      return apiClient.get<{items: any[], total: number}>('/intercompany/invoices', p);
+    },
+  });
+}
+export function useICReconciliation(year: number, month: number) {
+  return useQuery({
+    queryKey: ['ic', 'reconciliation', year, month],
+    queryFn: () => apiClient.get<any>(`/intercompany/reconciliation?year=${year}&month=${month}`),
+  });
+}
+export function useICLoans() {
+  return useQuery({ queryKey: ['ic', 'loans'], queryFn: () => apiClient.get<{items: any[], total: number}>('/intercompany/loans') });
+}
+
+// ─── Fixed Assets ─────────────────────────────────────────────────────────
+export function useAssets(siteId: string) {
+  return useQuery({ queryKey: ['assets', siteId], queryFn: () => apiClient.get<{items: any[], total: number}>(`/assets/${siteId}`), enabled: !!siteId });
+}
+export function useAssetSummary(siteId: string | null) {
+  return useQuery({
+    queryKey: ['assets', 'summary', siteId],
+    queryFn: () => siteId ? apiClient.get<any>(`/assets/${siteId}/summary`) : apiClient.get<any>('/assets/consolidated/summary'),
+  });
+}
+
+// ─── Tax ──────────────────────────────────────────────────────────────────
+export function useTaxJurisdictions() {
+  return useQuery({ queryKey: ['tax', 'jurisdictions'], queryFn: () => apiClient.get<{items: any[], total: number}>('/tax/jurisdictions') });
+}
+export function useTaxFilings(year?: number, status?: string) {
+  return useQuery({
+    queryKey: ['tax', 'filings', year, status],
+    queryFn: () => {
+      const p: Record<string,string> = {};
+      if (year) p.year = String(year);
+      if (status) p.status = status;
+      return apiClient.get<{items: any[], total: number}>('/tax/filings', p);
+    },
+  });
+}
+export function useTaxFilingOverview() {
+  return useQuery({ queryKey: ['tax', 'overview'], queryFn: () => apiClient.get<any>('/tax/filings/overview') });
+}
+
+// ─── Treasury ─────────────────────────────────────────────────────────────
+export function useBankAccounts(siteId: string) {
+  return useQuery({ queryKey: ['treasury', 'accounts', siteId], queryFn: () => apiClient.get<{items: any[], total: number}>(`/treasury/bank-accounts/${siteId}`), enabled: !!siteId });
+}
+export function useCashPosition(siteId: string | null, date: string) {
+  return useQuery({
+    queryKey: ['treasury', 'cash', siteId, date],
+    queryFn: () => siteId
+      ? apiClient.get<any>(`/treasury/cash-position/${siteId}?date=${date}`)
+      : apiClient.get<any>(`/treasury/cash-position/consolidated?date=${date}`),
+  });
+}
+export function useDebtMaturity() {
+  return useQuery({ queryKey: ['treasury', 'maturity'], queryFn: () => apiClient.get<any>('/treasury/debt/maturity-profile') });
+}
+
+// ─── Legal Entity ─────────────────────────────────────────────────────────
+export function useLegalEntities() {
+  return useQuery({ queryKey: ['legal', 'entities'], queryFn: () => apiClient.get<{items: any[], total: number}>('/legal/entities') });
+}
+export function useOwnershipStructure() {
+  return useQuery({ queryKey: ['legal', 'structure'], queryFn: () => apiClient.get<any>('/legal/structure') });
+}
+export function useStatutoryAudits(year?: number) {
+  return useQuery({
+    queryKey: ['legal', 'audits', year],
+    queryFn: () => { const p: Record<string,string> = {}; if (year) p.year = String(year); return apiClient.get<{items: any[], total: number}>('/legal/audits', p); },
+  });
+}

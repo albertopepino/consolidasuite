@@ -79,16 +79,11 @@ export function LoginPage() {
       {/* Left panel: Branding */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 text-white animate-fade-in">
         <div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 font-bold text-lg shadow-lg shadow-blue-500/30">
-              IF
-            </div>
-            <span className="text-xl font-semibold tracking-tight">InterFinOps</span>
-          </div>
+          <img src="/logo.png" alt="ConsolidaSuite" className="h-10 w-auto brightness-0 invert opacity-90" />
         </div>
         <div className="space-y-6 animate-slide-up" style={{ animationDelay: '200ms', animationFillMode: 'backwards' }}>
           <h1 className="text-5xl font-bold leading-tight tracking-tight">
-            Intercompany Financial<br />Operations Platform
+            Consolidation<br />Suite
           </h1>
           <p className="text-lg text-white/60 max-w-md leading-relaxed">
             Centralized financial reporting, KPI dashboards, and budget management
@@ -126,7 +121,7 @@ export function LoginPage() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 font-bold text-lg text-white shadow-lg shadow-blue-500/30">
                 IF
               </div>
-              <span className="text-xl font-semibold text-white">InterFinOps</span>
+              <span className="text-xl font-semibold text-white">ConsolidaSuite</span>
             </div>
           </div>
 
