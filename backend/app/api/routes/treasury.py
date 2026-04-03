@@ -124,49 +124,6 @@ async def create_bank_account(
 # ---------------------------------------------------------------------------
 
 
-@router.get("/cash-position/{site_id}", response_model=SiteCashPosition)
-async def cash_position_by_site(
-    site_id: uuid.UUID,
-    db: DbSession,
-    current_user: CurrentUser,
-    balance_date: date = Query(..., alias="date"),
-) -> SiteCashPosition:
-    """Cash position per site for a given date."""
-    site_result = await db.execute(select(Site).where(Site.id == site_id))
-    site = site_result.scalar_one_or_none()
-    if site is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Site not found")
-
-    stmt = (
-        select(CashPosition)
-        .join(BankAccount, BankAccount.id == CashPosition.bank_account_id)
-        .where(BankAccount.site_id == site_id)
-        .where(CashPosition.balance_date == balance_date)
-    )
-    result = await db.execute(stmt)
-    positions = result.scalars().all()
-
-    accounts: list[AccountCashEntry] = []
-    total = Decimal("0")
-    for p in positions:
-        ba = p.bank_account
-        accounts.append(AccountCashEntry(
-            bank_account_id=p.bank_account_id,
-            bank_name=ba.bank_name if ba else "Unknown",
-            balance=p.balance,
-            currency=p.currency,
-        ))
-        total += p.balance
-
-    return SiteCashPosition(
-        site_id=site_id,
-        site_name=site.name,
-        accounts=accounts,
-        total_local=total,
-        local_currency=site.local_currency,
-    )
-
-
 @router.get("/cash-position/consolidated", response_model=ConsolidatedCashResponse)
 async def consolidated_cash_position(
     db: DbSession,
@@ -244,6 +201,49 @@ async def consolidated_cash_position(
         group_currency=GROUP_CURRENCY,
         total_group=total_group,
         by_site=by_site,
+    )
+
+
+@router.get("/cash-position/{site_id}", response_model=SiteCashPosition)
+async def cash_position_by_site(
+    site_id: uuid.UUID,
+    db: DbSession,
+    current_user: CurrentUser,
+    balance_date: date = Query(..., alias="date"),
+) -> SiteCashPosition:
+    """Cash position per site for a given date."""
+    site_result = await db.execute(select(Site).where(Site.id == site_id))
+    site = site_result.scalar_one_or_none()
+    if site is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Site not found")
+
+    stmt = (
+        select(CashPosition)
+        .join(BankAccount, BankAccount.id == CashPosition.bank_account_id)
+        .where(BankAccount.site_id == site_id)
+        .where(CashPosition.balance_date == balance_date)
+    )
+    result = await db.execute(stmt)
+    positions = result.scalars().all()
+
+    accounts: list[AccountCashEntry] = []
+    total = Decimal("0")
+    for p in positions:
+        ba = p.bank_account
+        accounts.append(AccountCashEntry(
+            bank_account_id=p.bank_account_id,
+            bank_name=ba.bank_name if ba else "Unknown",
+            balance=p.balance,
+            currency=p.currency,
+        ))
+        total += p.balance
+
+    return SiteCashPosition(
+        site_id=site_id,
+        site_name=site.name,
+        accounts=accounts,
+        total_local=total,
+        local_currency=site.local_currency,
     )
 
 
