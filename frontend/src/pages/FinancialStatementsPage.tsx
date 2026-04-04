@@ -168,6 +168,21 @@ function formatAmt(amount: number, currency: string): string {
   return formatCurrency(amount, currency);
 }
 
+// ---- Section header color for top-level parent rows ----
+const SECTION_COLORS: Record<string, string> = {
+  REV: 'border-l-emerald-500 bg-emerald-50/60 dark:bg-emerald-900/10',
+  COGS: 'border-l-rose-500 bg-rose-50/60 dark:bg-rose-900/10',
+  OPEX: 'border-l-amber-500 bg-amber-50/60 dark:bg-amber-900/10',
+  CA: 'border-l-blue-500 bg-blue-50/60 dark:bg-blue-900/10',
+  NCA: 'border-l-indigo-500 bg-indigo-50/60 dark:bg-indigo-900/10',
+  CL: 'border-l-orange-500 bg-orange-50/60 dark:bg-orange-900/10',
+  NCL: 'border-l-red-500 bg-red-50/60 dark:bg-red-900/10',
+  EQ: 'border-l-violet-500 bg-violet-50/60 dark:bg-violet-900/10',
+  CFO: 'border-l-teal-500 bg-teal-50/60 dark:bg-teal-900/10',
+  CFI: 'border-l-sky-500 bg-sky-50/60 dark:bg-sky-900/10',
+  CFF: 'border-l-purple-500 bg-purple-50/60 dark:bg-purple-900/10',
+};
+
 // ─── Components ────────────────────────────────────────────────────────────
 
 function StatementTable({ rows, currency }: { rows: DisplayRow[]; currency: string }) {
@@ -175,51 +190,72 @@ function StatementTable({ rows, currency }: { rows: DisplayRow[]; currency: stri
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="border-b border-slate-200/60 dark:border-slate-700/40">
-            <th className="px-6 py-3.5 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400">
+          <tr className="border-b-2 border-slate-200 dark:border-slate-700">
+            <th className="px-7 py-4 text-left text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-400 dark:text-slate-500">
               Account
             </th>
-            <th className="px-6 py-3.5 text-right text-[11px] font-semibold uppercase tracking-widest text-slate-400 w-52">
+            <th className="w-56 px-7 py-4 text-right text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-400 dark:text-slate-500">
               Amount ({currency})
             </th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
-            <tr
-              key={row.code}
-              className={cn(
-                'border-b transition-colors duration-150',
-                row.isSummary
-                  ? 'border-slate-200/80 bg-slate-50/80 dark:bg-slate-800/50 dark:border-slate-700/40'
-                  : row.isHeader
-                  ? 'border-slate-100/60 bg-slate-50/40 dark:bg-slate-800/30 dark:border-slate-700/30'
-                  : 'border-slate-100/40 hover:bg-blue-50/30 dark:border-slate-700/20 dark:hover:bg-slate-700/20',
-              )}
-            >
-              <td className={cn(
-                'py-3 text-sm',
-                row.isChild ? 'pl-12 pr-6' : 'px-6',
-                row.isSummary ? 'font-bold text-slate-900 dark:text-white' : '',
-                row.isHeader && !row.isSummary ? 'font-semibold text-slate-800 dark:text-slate-200' : '',
-                !row.isHeader && !row.isSummary ? 'text-slate-600 dark:text-slate-400' : '',
-              )}>
-                {row.isSummary && (
-                  <span className="mr-2 text-slate-400">=</span>
+          {rows.map((row, idx) => {
+            const sectionColor = SECTION_COLORS[row.code] || '';
+            const isEvenChild = row.isChild && idx % 2 === 0;
+
+            return (
+              <tr
+                key={row.code}
+                className={cn(
+                  'border-b transition-colors duration-150',
+                  // Summary rows: bold double-border look
+                  row.isSummary && 'border-slate-300 dark:border-slate-600',
+                  row.isSummary && 'bg-gradient-to-r from-slate-50 to-slate-100/80 dark:from-slate-800/70 dark:to-slate-800/50',
+                  // Section header rows
+                  row.isHeader && !row.isSummary && cn('border-l-4', sectionColor, 'border-b-slate-100 dark:border-b-slate-700/40'),
+                  // Normal rows
+                  !row.isHeader && !row.isSummary && 'border-slate-50 dark:border-slate-700/20',
+                  // Alternating subtle bg for child rows
+                  row.isChild && isEvenChild && 'bg-slate-50/40 dark:bg-slate-800/20',
+                  // Hover for non-summary
+                  !row.isSummary && 'hover:bg-blue-50/50 dark:hover:bg-slate-700/30',
                 )}
-                {row.name}
-              </td>
-              <td className={cn(
-                'px-6 py-3 text-right font-mono text-sm tabular-nums',
-                row.isSummary ? 'font-bold' : '',
-                row.amount < 0 ? 'text-red-500 dark:text-red-400' :
-                  row.isSummary ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300',
-                row.isSummary && 'border-t-2 border-slate-300 dark:border-slate-600',
-              )}>
-                {formatAmt(row.amount, currency)}
-              </td>
-            </tr>
-          ))}
+              >
+                {/* Account name */}
+                <td
+                  className={cn(
+                    'py-3.5 text-sm',
+                    row.isChild ? 'pl-14 pr-7' : 'px-7',
+                    row.isSummary && 'border-t-2 border-t-slate-300 pt-4 pb-4 text-[15px] font-bold text-slate-900 dark:border-t-slate-600 dark:text-white',
+                    row.isHeader && !row.isSummary && 'font-semibold text-slate-800 dark:text-slate-200',
+                    row.isChild && 'text-slate-500 dark:text-slate-400',
+                    !row.isHeader && !row.isSummary && !row.isChild && 'text-slate-600 dark:text-slate-400',
+                  )}
+                >
+                  {row.isSummary && (
+                    <span className="mr-2 text-slate-300 dark:text-slate-600">=</span>
+                  )}
+                  {row.name}
+                </td>
+
+                {/* Amount */}
+                <td
+                  className={cn(
+                    'px-7 py-3.5 text-right font-mono text-sm tabular-nums',
+                    row.isSummary && 'border-t-2 border-t-slate-300 pt-4 pb-4 text-[15px] font-bold dark:border-t-slate-600',
+                    row.amount < 0
+                      ? 'text-red-600 dark:text-red-400'
+                      : row.isSummary
+                        ? 'text-slate-900 dark:text-white'
+                        : 'text-slate-700 dark:text-slate-300',
+                  )}
+                >
+                  {formatAmt(row.amount, currency)}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -245,25 +281,14 @@ function SiteStatementView({ siteId, year, month, statementType, siteName }: {
   const rows = buildDisplayRows(lineItemMap);
 
   return (
-    <div className="glass-card overflow-hidden animate-in">
-      <div className="border-b border-white/10 px-6 py-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">{siteName}</h2>
-            <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
-              {formatPeriod(year, month)} &middot; {stmt.currency}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <StatusBadge status={stmt.status} />
-            <span className="text-xs text-slate-400">
-              {formatDateTime(stmt.uploaded_at)}
-            </span>
-          </div>
-        </div>
-      </div>
-      <StatementTable rows={rows} currency={stmt.currency} />
-    </div>
+    <StatementCard
+      title={siteName}
+      period={formatPeriod(year, month)}
+      currency={stmt.currency}
+      status={stmt.status}
+      uploadedAt={stmt.uploaded_at}
+      rows={rows}
+    />
   );
 }
 
@@ -281,27 +306,74 @@ function ConsolidatedStatementView({ year, month, statementType }: {
   const rows = buildDisplayRows(statementData);
 
   return (
-    <div className="glass-card overflow-hidden animate-in">
-      <div className="border-b border-white/10 px-6 py-5">
-        <h2 className="text-lg font-bold text-slate-900 dark:text-white">Consolidated</h2>
-        <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
-          {formatPeriod(year, month)} &middot; EUR
-        </p>
+    <StatementCard
+      title="Consolidated"
+      period={formatPeriod(year, month)}
+      currency="EUR"
+      rows={rows}
+    />
+  );
+}
+
+function StatementCard({ title, period, currency, status, uploadedAt, rows }: {
+  title: string;
+  period: string;
+  currency: string;
+  status?: string;
+  uploadedAt?: string;
+  rows: DisplayRow[];
+}) {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-white/20 bg-white/60 shadow-xl shadow-slate-200/40 backdrop-blur-xl animate-in dark:border-white/5 dark:bg-slate-800/40 dark:shadow-slate-900/20">
+      {/* Card header */}
+      <div className="border-b border-slate-200/60 bg-gradient-to-r from-slate-50 to-white px-7 py-5 dark:border-slate-700/40 dark:from-slate-800/80 dark:to-slate-800/60">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-display text-lg font-bold text-slate-900 dark:text-white">{title}</h2>
+            <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+              {period} &middot; {currency}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            {status && <StatusBadge status={status} />}
+            {uploadedAt && (
+              <span className="text-xs text-slate-400 dark:text-slate-500">
+                {formatDateTime(uploadedAt)}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
-      <StatementTable rows={rows} currency="EUR" />
+      <StatementTable rows={rows} currency={currency} />
     </div>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    approved: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-    submitted: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-    draft: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
+  const config: Record<string, { bg: string; text: string; dot: string; glow: string }> = {
+    approved: {
+      bg: 'bg-emerald-500/10',
+      text: 'text-emerald-600 dark:text-emerald-400',
+      dot: 'bg-emerald-500',
+      glow: 'shadow-emerald-500/30',
+    },
+    submitted: {
+      bg: 'bg-blue-500/10',
+      text: 'text-blue-600 dark:text-blue-400',
+      dot: 'bg-blue-500',
+      glow: 'shadow-blue-500/30',
+    },
+    draft: {
+      bg: 'bg-slate-500/10',
+      text: 'text-slate-600 dark:text-slate-400',
+      dot: 'bg-slate-400',
+      glow: 'shadow-slate-400/20',
+    },
   };
+  const c = config[status] || config.draft;
   return (
-    <span className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold', styles[status] || styles.draft)}>
-      <span className={cn('h-1.5 w-1.5 rounded-full', status === 'approved' ? 'bg-emerald-500' : status === 'submitted' ? 'bg-blue-500' : 'bg-slate-400')} />
+    <span className={cn('inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-semibold shadow-sm', c.bg, c.text, c.glow)}>
+      <span className={cn('h-2 w-2 rounded-full shadow-sm', c.dot, c.glow)} />
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
@@ -309,13 +381,13 @@ function StatusBadge({ status }: { status: string }) {
 
 function LoadingSkeleton() {
   return (
-    <div className="glass-card overflow-hidden">
-      <div className="border-b border-white/10 px-6 py-5">
+    <div className="overflow-hidden rounded-2xl border border-white/20 bg-white/60 shadow-lg backdrop-blur-xl dark:border-white/5 dark:bg-slate-800/40">
+      <div className="border-b border-slate-200/60 px-7 py-5 dark:border-slate-700/40">
         <div className="h-5 w-48 animate-pulse rounded-lg bg-slate-200/60 dark:bg-slate-700/60" />
-        <div className="mt-2 h-4 w-32 animate-pulse rounded-lg bg-slate-100/60 dark:bg-slate-700/40" />
+        <div className="mt-2.5 h-4 w-32 animate-pulse rounded-lg bg-slate-100/60 dark:bg-slate-700/40" />
       </div>
-      <div className="p-6 space-y-3">
-        {Array.from({ length: 10 }).map((_, i) => (
+      <div className="space-y-3 p-7">
+        {Array.from({ length: 12 }).map((_, i) => (
           <div key={i} className="flex justify-between">
             <div className="h-4 animate-pulse rounded bg-slate-100/60 dark:bg-slate-700/40" style={{ width: `${120 + Math.random() * 150}px` }} />
             <div className="h-4 w-24 animate-pulse rounded bg-slate-100/60 dark:bg-slate-700/40" />
@@ -328,26 +400,26 @@ function LoadingSkeleton() {
 
 function ErrorState() {
   return (
-    <div className="glass-card p-10 text-center">
-      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10">
-        <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="rounded-2xl border border-red-200/30 bg-white/60 p-12 text-center shadow-lg backdrop-blur-xl dark:border-red-800/20 dark:bg-slate-800/40">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500/10">
+        <svg className="h-7 w-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
         </svg>
       </div>
-      <p className="text-sm text-red-600 dark:text-red-400">Failed to load data. Please try again.</p>
+      <p className="text-sm font-medium text-red-600 dark:text-red-400">Failed to load data. Please try again.</p>
     </div>
   );
 }
 
 function EmptyState() {
   return (
-    <div className="glass-card p-12 text-center">
-      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-500/10">
-        <svg className="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="rounded-2xl border border-white/20 bg-white/60 p-14 text-center shadow-lg backdrop-blur-xl dark:border-white/5 dark:bg-slate-800/40">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-500/10">
+        <svg className="h-7 w-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       </div>
-      <p className="text-sm text-slate-500 dark:text-slate-400">No statement data available for this period.</p>
+      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">No statement data available for this period.</p>
     </div>
   );
 }
@@ -365,31 +437,39 @@ export function FinancialStatementsPage() {
   const siteName = useMemo(() => {
     if (!selectedSiteId || !sites) return t('common.allSites');
     return sites.find((s) => s.id === selectedSiteId)?.name ?? 'Unknown Site';
-  }, [selectedSiteId, sites]);
+  }, [selectedSiteId, sites, t]);
 
   return (
-    <div className="space-y-6 animate-in">
-      {/* Page Header */}
+    <div className="space-y-8 animate-in">
+      {/* ── Breadcrumb-style Header ─────────────────────────────────────── */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+        <div className="flex items-center gap-2 text-sm text-slate-400 dark:text-slate-500">
+          <span className="font-medium text-slate-600 dark:text-slate-300">{siteName}</span>
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+          <span className="font-medium text-slate-600 dark:text-slate-300">{formatPeriod(selectedYear, selectedMonth)}</span>
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+          <span className="text-slate-400 dark:text-slate-500">{t(`statements.${activeTab === 'income_statement' ? 'incomeStatement' : activeTab === 'balance_sheet' ? 'balanceSheet' : 'cashFlow'}`)}</span>
+        </div>
+        <h1 className="mt-2 font-display text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
           {t('statements.title')}
         </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          {siteName} &middot; {formatPeriod(selectedYear, selectedMonth)}
-        </p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2">
+      {/* ── Segmented Control Tabs (macOS-style pill) ───────────────────── */}
+      <div className="inline-flex rounded-2xl border border-slate-200/60 bg-slate-100/80 p-1.5 shadow-inner backdrop-blur-sm dark:border-slate-700/40 dark:bg-slate-800/60">
         {TAB_DEFS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              'inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200',
+              'relative inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-200',
               activeTab === tab.key
-                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                : 'glass-card !rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                ? 'bg-white text-slate-900 shadow-md shadow-slate-200/50 dark:bg-slate-700 dark:text-white dark:shadow-slate-900/30'
+                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
             )}
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -400,7 +480,7 @@ export function FinancialStatementsPage() {
         ))}
       </div>
 
-      {/* Content */}
+      {/* ── Content ─────────────────────────────────────────────────────── */}
       {selectedSiteId ? (
         <SiteStatementView siteId={selectedSiteId} year={selectedYear} month={selectedMonth} statementType={activeTab} siteName={siteName} />
       ) : (
