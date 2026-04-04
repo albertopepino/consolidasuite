@@ -35,9 +35,12 @@ class Settings(BaseSettings):
     # Cookie settings
     COOKIE_DOMAIN: str | None = None
     COOKIE_SECURE: bool = True
-    COOKIE_SAMESITE: str = "lax"
+    COOKIE_SAMESITE: str = "strict"
 
 
 settings = Settings()
+
+if not settings.DEBUG and settings.SECRET_KEY == "CHANGE-ME-IN-PRODUCTION":
+    raise RuntimeError("FATAL: SECRET_KEY must be changed in production! Set a secure random key via environment variable.")
 
 __all__ = ["settings", "Settings"]

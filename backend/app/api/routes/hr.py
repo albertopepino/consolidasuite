@@ -5,11 +5,14 @@ import io
 import uuid
 from decimal import Decimal, InvalidOperation
 
-from fastapi import APIRouter, HTTPException, Query, UploadFile, status
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 
-from app.api.deps import AuditLogger, CurrentUser, DbSession, require_site_access
+from app.api.deps import AuditLogger, CurrentUser, DbSession, require_role, require_site_access
+from app.models.user import User, UserRole
 from app.models.fx_rate import FxRate
 from app.models.hr import Department, Employee, EmploymentType, Position, SalaryRecord
 from app.models.site import Site
@@ -329,6 +332,11 @@ async def upload_salaries_csv(
     """
     await require_site_access(site_id, current_user)
 
+    # Validate file extension
+    filename = file.filename or ""
+    if not filename.lower().endswith(('.csv', '.xlsx', '.xls')):
+        raise HTTPException(400, "Only .csv, .xlsx, .xls files are accepted")
+
     # Get site for currency
     site_result = await db.execute(select(Site).where(Site.id == site_id))
     site = site_result.scalar_one_or_none()
@@ -456,7 +464,7 @@ async def _build_headcount(db: DbSession, site_id: uuid.UUID | None, site_name: 
 @router.get("/headcount/consolidated", response_model=HeadcountSummary)
 async def get_consolidated_headcount(
     db: DbSession,
-    current_user: CurrentUser,
+    current_user: Annotated[User, Depends(require_role(UserRole.admin, UserRole.group_cfo))],
 ) -> HeadcountSummary:
     """Consolidated headcount across all sites."""
     return await _build_headcount(db, None, "All Sites")
@@ -573,7 +581,7 @@ async def _build_payroll_summary(
 @router.get("/payroll/consolidated", response_model=ConsolidatedPayrollSummary)
 async def get_consolidated_payroll(
     db: DbSession,
-    current_user: CurrentUser,
+    current_user: Annotated[User, Depends(require_role(UserRole.admin, UserRole.group_cfo))],
     year: int = Query(ge=2000, le=2100),
     month: int = Query(ge=1, le=12),
 ) -> ConsolidatedPayrollSummary:
