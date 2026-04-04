@@ -3,6 +3,7 @@ import { useTaxJurisdictions, useTaxFilings, useTaxFilingOverview } from '@/api/
 import { cn } from '@/utils/cn';
 import { useTranslation } from '@/i18n/useTranslation';
 import { useDashboardStore } from '@/store/dashboardStore';
+import { ExportButton } from '@/components/ui/ExportButton';
 
 type TaxTab = 'rates' | 'filings';
 
@@ -213,13 +214,19 @@ export function TaxPage() {
 
   return (
     <div className="page-enter space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
-          {t('tax.title')}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          {t('tax.subtitle')}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
+            {t('tax.title')}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            {t('tax.subtitle')}
+          </p>
+        </div>
+        <ExportButton
+          endpoint="/export/tax-filings"
+          filename="tax_filings"
+        />
       </div>
 
       <div className="flex gap-6 border-b border-slate-200 mb-6">

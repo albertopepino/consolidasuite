@@ -4,6 +4,7 @@ import { useSites, useSiteStatements, useConsolidatedFinancialData } from '@/api
 import { formatCurrency, formatPeriod, formatDateTime } from '@/utils/formatters';
 import { cn } from '@/utils/cn';
 import { useTranslation } from '@/i18n/useTranslation';
+import { ExportButton } from '@/components/ui/ExportButton';
 
 type StatementTab = 'income_statement' | 'balance_sheet' | 'cash_flow';
 
@@ -438,9 +439,22 @@ export function FinancialStatementsPage() {
           </svg>
           <span className="text-slate-400 dark:text-slate-500">{t(`statements.${activeTab === 'income_statement' ? 'incomeStatement' : activeTab === 'balance_sheet' ? 'balanceSheet' : 'cashFlow'}`)}</span>
         </div>
-        <h1 className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
-          {t('statements.title')}
-        </h1>
+        <div className="mt-2 flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
+            {t('statements.title')}
+          </h1>
+          {selectedSiteId && (
+            <ExportButton
+              endpoint={`/export/financial-statements/${selectedSiteId}`}
+              filename={`statements_${selectedSiteId}_${selectedYear}_${selectedMonth}`}
+              params={{
+                period_year: String(selectedYear),
+                period_month: String(selectedMonth),
+                ...(activeTab !== 'income_statement' ? { statement_type: activeTab } : {}),
+              }}
+            />
+          )}
+        </div>
       </div>
 
       {/* ── Underline Tabs ────────────────────────────────────────────── */}

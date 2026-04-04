@@ -539,3 +539,109 @@ export function useStatutoryAudits(year?: number) {
     queryFn: () => { const p: Record<string,string> = {}; if (year) p.year = String(year); return apiClient.get<{items: any[], total: number}>('/legal/audits', p); },
   });
 }
+
+// ─── Workflow ────────────────────────────────────────────────────────────────
+export function useWorkflowInstances() {
+  return useQuery({
+    queryKey: ['workflow', 'instances'],
+    queryFn: () => apiClient.get<{items: any[], total: number}>('/workflow/instances'),
+  });
+}
+
+export function useMyTasks() {
+  return useQuery({
+    queryKey: ['workflow', 'my-tasks'],
+    queryFn: () => apiClient.get<{items: any[], total: number}>('/workflow/my-tasks'),
+  });
+}
+
+// ─── Scenarios ───────────────────────────────────────────────────────────────
+export function useScenarios() {
+  return useQuery({
+    queryKey: ['scenarios'],
+    queryFn: () => apiClient.get<{items: any[], total: number}>('/scenarios'),
+  });
+}
+
+export function useScenarioProjected(id: string) {
+  return useQuery({
+    queryKey: ['scenarios', 'projected', id],
+    queryFn: () => apiClient.get<any>(`/scenarios/${id}/projected`),
+    enabled: !!id,
+  });
+}
+
+// ─── Forecasts ───────────────────────────────────────────────────────────────
+export function useForecasts(siteId: string, year: number) {
+  return useQuery({
+    queryKey: ['forecasts', siteId, year],
+    queryFn: () => apiClient.get<{items: any[], total: number}>(`/forecasts/${siteId}?year=${year}`),
+    enabled: !!siteId,
+  });
+}
+
+// ─── ERP Connectors ──────────────────────────────────────────────────────────
+export function useConnectors() {
+  return useQuery({
+    queryKey: ['connectors'],
+    queryFn: () => apiClient.get<{items: any[], total: number}>('/connectors'),
+  });
+}
+
+export function useSyncConnector() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (connectorId: string) => apiClient.post<any>(`/connectors/${connectorId}/sync`),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['connectors'] }); },
+  });
+}
+
+// ─── Reconciliation ──────────────────────────────────────────────────────────
+export function useReconciliationItems(siteId: string) {
+  return useQuery({
+    queryKey: ['reconciliation', siteId],
+    queryFn: () => apiClient.get<{items: any[], total: number}>(`/reconciliation/${siteId}`),
+    enabled: !!siteId,
+  });
+}
+
+// ─── Leases ──────────────────────────────────────────────────────────────────
+export function useLeases(siteId: string) {
+  return useQuery({
+    queryKey: ['leases', siteId],
+    queryFn: () => apiClient.get<{items: any[], total: number}>(`/leases/${siteId}`),
+    enabled: !!siteId,
+  });
+}
+
+// ─── ESG ─────────────────────────────────────────────────────────────────────
+export function useESGMetrics(siteId: string) {
+  return useQuery({
+    queryKey: ['esg', 'metrics', siteId],
+    queryFn: () => apiClient.get<{items: any[], total: number}>(`/esg/metrics/${siteId}`),
+    enabled: !!siteId,
+  });
+}
+
+export function useESGReports() {
+  return useQuery({
+    queryKey: ['esg', 'reports'],
+    queryFn: () => apiClient.get<{items: any[], total: number}>('/esg/reports'),
+  });
+}
+
+// ─── Allocations ─────────────────────────────────────────────────────────────
+export function useAllocationRules() {
+  return useQuery({
+    queryKey: ['allocations', 'rules'],
+    queryFn: () => apiClient.get<{items: any[], total: number}>('/allocations/rules'),
+  });
+}
+
+export function useExecuteAllocation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (ruleId: string) => apiClient.post<any>(`/allocations/rules/${ruleId}/execute`),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['allocations'] }); },
+  });
+}

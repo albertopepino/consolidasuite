@@ -3,6 +3,7 @@ import { useSites, useHeadcount, usePayroll, useUploadSalaries } from '@/api/hoo
 import { useDashboardStore } from '@/store/dashboardStore';
 import { useTranslation } from '@/i18n/useTranslation';
 import { cn } from '@/utils/cn';
+import { ExportButton } from '@/components/ui/ExportButton';
 
 const TABS = ['headcount', 'payroll', 'upload'] as const;
 type Tab = (typeof TABS)[number];
@@ -501,11 +502,28 @@ export function HRPage() {
   return (
     <div className="page-enter space-y-6">
       {/* Simple page title */}
-      <div>
+      <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
           {t('hr.title') || 'People & Payroll'}
         </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+        <div className="flex items-center gap-2">
+          {siteId && (
+            <>
+              <ExportButton
+                endpoint={`/export/employees/${siteId}`}
+                filename={`employees_${siteId}`}
+              />
+              <ExportButton
+                endpoint={`/export/salaries/${siteId}`}
+                filename={`salaries_${siteId}_${selectedYear}_${selectedMonth}`}
+                params={{ year: String(selectedYear), month: String(selectedMonth) }}
+              />
+            </>
+          )}
+        </div>
+      </div>
+      <div>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
           Manage headcount, payroll, and salary data across all sites.
         </p>
       </div>
