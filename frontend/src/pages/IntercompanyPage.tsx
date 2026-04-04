@@ -3,6 +3,7 @@ import { useDashboardStore } from '@/store/dashboardStore';
 import { useSites, useICInvoices, useICReconciliation, useICLoans } from '@/api/hooks';
 import { cn } from '@/utils/cn';
 import { useTranslation } from '@/i18n/useTranslation';
+import { ExportButton } from '@/components/ui/ExportButton';
 
 type ICTab = 'invoices' | 'reconciliation' | 'loans';
 
@@ -247,13 +248,20 @@ export function IntercompanyPage() {
 
   return (
     <div className="page-enter space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
-          {t('ic.title')}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          {siteName}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
+            {t('ic.title')}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            {siteName}
+          </p>
+        </div>
+        <ExportButton
+          endpoint="/export/ic-invoices"
+          filename="ic_invoices"
+          params={selectedSiteId ? { site_id: selectedSiteId } : {}}
+        />
       </div>
 
       <div className="flex gap-6 border-b border-slate-200 mb-6">

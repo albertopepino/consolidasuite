@@ -3,6 +3,7 @@ import { useDashboardStore } from '@/store/dashboardStore';
 import { useSites, useAssets, useAssetSummary } from '@/api/hooks';
 import { cn } from '@/utils/cn';
 import { useTranslation } from '@/i18n/useTranslation';
+import { ExportButton } from '@/components/ui/ExportButton';
 
 const CATEGORY_PILLS: Record<string, string> = {
   buildings: 'pill-blue',
@@ -138,11 +139,19 @@ export function AssetsPage() {
 
   return (
     <div className="page-enter space-y-8">
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
-          {t('assets.title')}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{siteName}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
+            {t('assets.title')}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{siteName}</p>
+        </div>
+        {selectedSiteId && (
+          <ExportButton
+            endpoint={`/export/assets/${selectedSiteId}`}
+            filename={`assets_${selectedSiteId}`}
+          />
+        )}
       </div>
 
       {/* Summary Cards - white with colored left border */}
