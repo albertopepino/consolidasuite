@@ -4,48 +4,41 @@
 
 @layer base {
   :root {
-    /* macOS-inspired color palette */
-    --glass-bg: rgba(255, 255, 255, 0.72);
-    --glass-border: rgba(255, 255, 255, 0.18);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-    --sidebar-bg: rgba(30, 41, 59, 0.95);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.06);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
   }
-
   .dark {
-    --glass-bg: rgba(30, 41, 59, 0.72);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.32);
-    --sidebar-bg: rgba(15, 23, 42, 0.95);
+    --glass-bg: rgba(26, 35, 50, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
-
   html {
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     letter-spacing: -0.01em;
   }
-
-  h1, h2, h3, h4, h5, h6 {
+  h1, h2, h3, h4 {
     font-family: 'Comfortaa', 'DM Sans', system-ui, sans-serif;
     letter-spacing: -0.02em;
   }
-
   body {
-    @apply bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100 text-slate-900
-           dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 dark:text-slate-100;
+    @apply bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-100
+           dark:from-surface-dark dark:via-surface-dark-dim dark:to-surface-dark
+           text-slate-900 dark:text-slate-100;
     min-height: 100vh;
   }
 }
 
 @layer components {
+  /* Glass card - the primary container */
   .glass {
     background: var(--glass-bg);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid var(--glass-border);
   }
-
   .glass-card {
     background: var(--glass-bg);
     backdrop-filter: blur(20px) saturate(180%);
@@ -55,143 +48,124 @@
     box-shadow: var(--glass-shadow);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-
   .glass-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
   }
 
-  .input-base {
-    @apply block w-full rounded-xl border border-slate-200/60 bg-white/80 backdrop-blur-sm px-4 py-2.5 text-sm
-           placeholder:text-slate-400
-           focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10
+  /* Gradient cards for hero KPIs */
+  .gradient-card {
+    @apply relative overflow-hidden rounded-2xl p-6 text-white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .gradient-card:hover {
+    transform: translateY(-2px);
+  }
+  .gradient-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Inputs */
+  .input {
+    @apply block w-full rounded-xl border border-slate-200/60 bg-white/80 backdrop-blur-sm
+           px-4 py-2.5 text-sm placeholder:text-slate-400
+           focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-500/10
            dark:border-slate-600/40 dark:bg-slate-800/80 dark:text-slate-100
-           dark:focus:border-blue-500 dark:focus:ring-blue-500/20
            transition-all duration-200;
   }
-
-  .label {
-    @apply block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2;
+  .input-label {
+    @apply block text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2;
   }
 
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl text-sm font-semibold
+           transition-all duration-200 active:scale-[0.97];
+  }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-blue-500 to-blue-600
-           px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/25
-           hover:from-blue-600 hover:to-blue-700 hover:shadow-blue-500/30
-           active:scale-[0.98] transition-all duration-200;
+    @apply btn bg-gradient-to-b from-brand-500 to-brand-600 text-white px-5 py-2.5
+           shadow-lg shadow-brand-500/20 hover:shadow-xl hover:shadow-brand-500/30 hover:brightness-110;
+  }
+  .btn-accent {
+    @apply btn bg-gradient-to-b from-accent-400 to-accent-500 text-white px-5 py-2.5
+           shadow-lg shadow-accent-500/20 hover:shadow-xl hover:shadow-accent-500/30 hover:brightness-110;
+  }
+  .btn-ghost {
+    @apply btn px-4 py-2 text-slate-600 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:bg-slate-700/40;
+  }
+  .btn-glass {
+    @apply btn glass px-4 py-2.5 text-slate-700 dark:text-slate-300
+           hover:bg-white/90 dark:hover:bg-slate-700/60;
   }
 
-  .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl
-           border border-slate-200/60 bg-white/80 backdrop-blur-sm
-           px-4 py-2.5 text-sm font-medium text-slate-700
-           hover:bg-white hover:border-slate-300 hover:shadow-sm
-           active:scale-[0.98] transition-all duration-200
-           dark:border-slate-600/40 dark:bg-slate-800/80 dark:text-slate-300
-           dark:hover:bg-slate-700/80;
+  /* Status pills */
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold;
   }
+  .pill-green { @apply pill bg-emerald-500/10 text-emerald-600 dark:text-emerald-400; }
+  .pill-red { @apply pill bg-red-500/10 text-red-600 dark:text-red-400; }
+  .pill-blue { @apply pill bg-brand-500/10 text-brand-600 dark:text-brand-400; }
+  .pill-amber { @apply pill bg-amber-500/10 text-amber-600 dark:text-amber-400; }
+  .pill-violet { @apply pill bg-violet-500/10 text-violet-600 dark:text-violet-400; }
+  .pill-slate { @apply pill bg-slate-500/10 text-slate-600 dark:text-slate-400; }
+
+  /* Status dot */
+  .dot { @apply h-1.5 w-1.5 rounded-full; }
+  .dot-green { @apply dot bg-emerald-500; }
+  .dot-red { @apply dot bg-red-500; }
+  .dot-blue { @apply dot bg-brand-500; }
+  .dot-amber { @apply dot bg-amber-500; }
+
+  /* Segmented control (macOS-style tabs) */
+  .segmented-control {
+    @apply inline-flex rounded-xl bg-slate-100/80 p-1 dark:bg-slate-800/80;
+  }
+  .segmented-control button {
+    @apply rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200
+           text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200;
+  }
+  .segmented-control button.active {
+    @apply bg-white text-slate-900 shadow-md dark:bg-slate-700 dark:text-white;
+  }
+
+  /* Page animate-in */
+  .page-enter {
+    animation: fadeInUp 0.5s ease-out;
+  }
+
+  /* Stagger children */
+  .stagger-children > * {
+    opacity: 0;
+    animation: fadeInUp 0.4s ease-out forwards;
+  }
+  .stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger-children > *:nth-child(2) { animation-delay: 50ms; }
+  .stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+  .stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+  .stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+  .stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+  .stagger-children > *:nth-child(7) { animation-delay: 300ms; }
+  .stagger-children > *:nth-child(8) { animation-delay: 350ms; }
 }
 
 @layer utilities {
-  .shadow-glass {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-  }
-
-  .animate-in {
-    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+    scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
   }
-
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: rgba(148, 163, 184, 0.3);
-    border-radius: 3px;
-  }
+  .scrollbar-thin::-webkit-scrollbar { width: 5px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background-color: rgba(148, 163, 184, 0.2); border-radius: 3px; }
 }
 
-/* Smooth page transitions */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* ApexCharts overrides */
+.apexcharts-tooltip { border-radius: 12px !important; border: 1px solid rgba(0,0,0,0.06) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important; }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* react-grid-layout */
-.react-grid-layout {
-  position: relative;
-  transition: height 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.react-grid-item {
-  transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  transition-property: left, top, width, height;
-}
-
-.react-grid-item.cssTransforms {
-  transition-property: transform, width, height;
-}
-
-.react-grid-item.resizing {
-  opacity: 0.9;
-  z-index: 1;
-}
-
-.react-grid-item.react-draggable-dragging {
-  z-index: 3;
-  opacity: 0.85;
-  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.15);
-  border-radius: 16px;
-}
-
-.react-grid-item > .react-resizable-handle {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-}
-
-.react-grid-item > .react-resizable-handle::after {
-  content: '';
-  position: absolute;
-  right: 5px;
-  bottom: 5px;
-  width: 5px;
-  height: 5px;
-  border-right: 2px solid rgba(0, 0, 0, 0.12);
-  border-bottom: 2px solid rgba(0, 0, 0, 0.12);
-  border-radius: 1px;
-}
-
-.react-grid-item > .react-resizable-handle.react-resizable-handle-se {
-  bottom: 0;
-  right: 0;
-  cursor: se-resize;
-}
-
-.dashboard-grid {
-  margin: -8px;
-}
+/* react-grid-layout (kept minimal, not currently used) */
+.react-grid-item.react-draggable-dragging { z-index: 3; opacity: 0.85; box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.15); border-radius: 16px; }

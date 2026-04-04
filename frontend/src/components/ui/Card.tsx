@@ -1,82 +1,14 @@
-import React from 'react';
 import { cn } from '@/utils/cn';
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'outlined' | 'elevated';
-  padding?: 'none' | 'sm' | 'md' | 'lg';
+export function Card({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn('glass-card', className)} {...props}>{children}</div>;
 }
-
-const paddingClasses = {
-  none: '',
-  sm: 'p-3',
-  md: 'p-4',
-  lg: 'p-6',
-};
-
-export function Card({
-  className,
-  variant = 'default',
-  padding = 'md',
-  children,
-  ...props
-}: CardProps) {
-  return (
-    <div
-      className={cn(
-        'glass-card',
-        variant === 'elevated' && 'shadow-card-hover',
-        variant === 'outlined' && 'shadow-none border-dashed',
-        paddingClasses[padding],
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  );
+export function CardHeader({ className, children }: { className?: string; children: React.ReactNode }) {
+  return <div className={cn('px-6 py-4 border-b border-slate-200/30 dark:border-slate-700/20', className)}>{children}</div>;
 }
-
-export function CardHeader({
-  className,
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn('flex items-center justify-between mb-3', className)}
-      {...props}
-    >
-      {children}
-    </div>
-  );
+export function CardTitle({ className, children }: { className?: string; children: React.ReactNode }) {
+  return <h3 className={cn('text-base font-semibold font-display text-slate-900 dark:text-white', className)}>{children}</h3>;
 }
-
-export function CardTitle({
-  className,
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLHeadingElement>) {
-  return (
-    <h3
-      className={cn(
-        'text-sm font-semibold font-display text-slate-700 dark:text-slate-200',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </h3>
-  );
-}
-
-export function CardContent({
-  className,
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div className={cn('', className)} {...props}>
-      {children}
-    </div>
-  );
+export function CardContent({ className, children }: { className?: string; children: React.ReactNode }) {
+  return <div className={cn('p-6', className)}>{children}</div>;
 }

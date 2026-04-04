@@ -119,7 +119,7 @@ export function DashboardGrid() {
   const show = (id: string) => visibleWidgets.includes(id);
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 stagger-children">
       {show('revenue-trend') && (
         <ChartCard title={t('chart.revenueTrend')} subtitle={t('chart.last6months')}>
           <FinancialLineChart data={chartData.revenueTrend} dataKey="value" xAxisKey="name" color="#3b82f6" />

@@ -6,24 +6,24 @@ import { useDashboardStore } from '@/store/dashboardStore';
 
 type LegalTab = 'entities' | 'directors' | 'audits';
 
-const ENTITY_TYPE_COLORS: Record<string, string> = {
-  'holding': 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
-  'operating': 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  'dormant': 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
-  'spv': 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  'branch': 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
+const ENTITY_TYPE_PILLS: Record<string, string> = {
+  holding: 'pill-violet',
+  operating: 'pill-blue',
+  dormant: 'pill-slate',
+  spv: 'pill-amber',
+  branch: 'pill-blue',
 };
 
-const AUDIT_STATUS_COLORS: Record<string, string> = {
-  not_started: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
-  in_progress: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  draft_report: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  final_report: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  filed: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  completed: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  scheduled: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  overdue: 'bg-red-500/10 text-red-600 dark:text-red-400',
-  pending: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
+const AUDIT_STATUS_PILLS: Record<string, string> = {
+  not_started: 'pill-slate',
+  in_progress: 'pill-blue',
+  draft_report: 'pill-amber',
+  final_report: 'pill-green',
+  filed: 'pill-green',
+  completed: 'pill-green',
+  scheduled: 'pill-amber',
+  overdue: 'pill-red',
+  pending: 'pill-slate',
 };
 
 const AUDIT_DOT_COLORS: Record<string, string> = {
@@ -40,9 +40,11 @@ const AUDIT_DOT_COLORS: Record<string, string> = {
 
 function StatusBadge({ status }: { status: string }) {
   const s = status.toLowerCase().replace(/[\s]+/g, '_');
+  const pill = AUDIT_STATUS_PILLS[s] || 'pill-slate';
+  const dot = AUDIT_DOT_COLORS[s] || 'bg-slate-400';
   return (
-    <span className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold', AUDIT_STATUS_COLORS[s] || AUDIT_STATUS_COLORS.pending)}>
-      <span className={cn('h-1.5 w-1.5 rounded-full', AUDIT_DOT_COLORS[s] || AUDIT_DOT_COLORS.pending)} />
+    <span className={cn(pill, 'inline-flex items-center gap-1.5')}>
+      <span className={cn('h-1.5 w-1.5 rounded-full', dot)} />
       {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
     </span>
   );
@@ -50,12 +52,8 @@ function StatusBadge({ status }: { status: string }) {
 
 function TypeBadge({ type }: { type: string }) {
   const key = type.toLowerCase().replace(/[\s]+/g, '_');
-  const color = ENTITY_TYPE_COLORS[key] || 'bg-slate-500/10 text-slate-600 dark:text-slate-400';
-  return (
-    <span className={cn('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold', color)}>
-      {type}
-    </span>
-  );
+  const pill = ENTITY_TYPE_PILLS[key] || 'pill-slate';
+  return <span className={pill}>{type}</span>;
 }
 
 function LoadingSkeleton() {
@@ -95,35 +93,36 @@ function EntitiesTab() {
   if (items.length === 0) return <EmptyState message={t('common.noData')} />;
 
   return (
-    <div className="glass-card overflow-hidden animate-in">
-      <div className="border-b border-white/10 px-6 py-4">
-        <h2 className="text-lg font-bold font-display text-slate-900 dark:text-white">{t('legal.entities')}</h2>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-200/60 dark:border-slate-700/40">
-              <th className="px-6 py-3.5 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400">{t('legal.entityName')}</th>
-              <th className="px-6 py-3.5 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400">{t('legal.registration')}</th>
-              <th className="px-6 py-3.5 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400">{t('legal.entityType')}</th>
-              <th className="px-6 py-3.5 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400">{t('legal.jurisdiction')}</th>
-              <th className="px-6 py-3.5 text-right text-[11px] font-semibold uppercase tracking-widest text-slate-400">{t('legal.ownership')}</th>
-              <th className="px-6 py-3.5 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400">{t('common.status')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((e: any, idx: number) => (
-              <tr key={e.id || idx} className="border-b border-slate-100/40 hover:bg-blue-50/30 dark:border-slate-700/20 dark:hover:bg-slate-700/20 transition-colors duration-150">
-                <td className="px-6 py-3 text-sm font-medium text-slate-700 dark:text-slate-300">{e.name || e.entity_name}</td>
-                <td className="px-6 py-3 text-sm font-mono text-slate-500 dark:text-slate-400">{e.registration_number || e.reg_number || '-'}</td>
-                <td className="px-6 py-3"><TypeBadge type={e.entity_type || e.type || '-'} /></td>
-                <td className="px-6 py-3 text-sm text-slate-500 dark:text-slate-400">{e.jurisdiction || e.country || '-'}</td>
-                <td className="px-6 py-3 text-sm text-right font-mono tabular-nums text-slate-700 dark:text-slate-300">{e.ownership_pct != null ? `${e.ownership_pct}%` : '-'}</td>
-                <td className="px-6 py-3"><StatusBadge status={e.status || 'active'} /></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="space-y-4 stagger-children">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map((e: any, idx: number) => (
+          <div key={e.id || idx} className="glass-card overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.01]">
+            <div className="p-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">{e.name || e.entity_name}</h3>
+                  <p className="mt-0.5 text-xs font-mono text-slate-400 dark:text-slate-500">{e.registration_number || e.reg_number || '-'}</p>
+                </div>
+                <TypeBadge type={e.entity_type || e.type || '-'} />
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t('legal.jurisdiction')}</p>
+                  <p className="mt-0.5 text-sm text-slate-700 dark:text-slate-300">{e.jurisdiction || e.country || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t('legal.ownership')}</p>
+                  <p className="mt-0.5 text-sm font-mono tabular-nums text-slate-700 dark:text-slate-300">{e.ownership_pct != null ? `${e.ownership_pct}%` : '-'}</p>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <StatusBadge status={e.status || 'active'} />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -137,17 +136,19 @@ function DirectorsTab() {
   const entities = data?.items ?? [];
   if (entities.length === 0) return <EmptyState message={t('common.noData')} />;
 
-  // Group directors by entity
   const entitiesWithDirectors = entities.filter((e: any) => e.directors && e.directors.length > 0);
   if (entitiesWithDirectors.length === 0) return <EmptyState message={t('common.noData')} />;
 
   return (
-    <div className="space-y-4 animate-in">
+    <div className="space-y-4 stagger-children">
       {entitiesWithDirectors.map((entity: any, idx: number) => (
         <div key={entity.id || idx} className="glass-card overflow-hidden">
-          <div className="border-b border-white/10 px-6 py-4">
-            <h3 className="text-base font-bold font-display text-slate-900 dark:text-white">{entity.name || entity.entity_name}</h3>
-            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{entity.jurisdiction || entity.country}</p>
+          <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-bold font-display text-slate-900 dark:text-white">{entity.name || entity.entity_name}</h3>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{entity.jurisdiction || entity.country}</p>
+            </div>
+            <span className="pill-slate">{entity.directors.length}</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -160,9 +161,9 @@ function DirectorsTab() {
               </thead>
               <tbody>
                 {entity.directors.map((d: any, dIdx: number) => (
-                  <tr key={dIdx} className="border-b border-slate-100/40 hover:bg-blue-50/30 dark:border-slate-700/20 dark:hover:bg-slate-700/20 transition-colors duration-150">
+                  <tr key={dIdx} className="border-b border-slate-100/40 transition-colors duration-150 hover:bg-blue-50/30 dark:border-slate-700/20 dark:hover:bg-slate-700/20">
                     <td className="px-6 py-3 text-sm font-medium text-slate-700 dark:text-slate-300">{d.name || d.full_name}</td>
-                    <td className="px-6 py-3 text-sm text-slate-500 dark:text-slate-400">{d.role || d.position || '-'}</td>
+                    <td className="px-6 py-3"><span className="pill-blue">{d.role || d.position || '-'}</span></td>
                     <td className="px-6 py-3 text-sm text-slate-500 dark:text-slate-400">{d.appointed_date || d.start_date || '-'}</td>
                   </tr>
                 ))}
@@ -185,7 +186,7 @@ function AuditsTab() {
   if (items.length === 0) return <EmptyState message={t('common.noData')} />;
 
   return (
-    <div className="glass-card overflow-hidden animate-in">
+    <div className="glass-card overflow-hidden">
       <div className="border-b border-white/10 px-6 py-4">
         <h2 className="text-lg font-bold font-display text-slate-900 dark:text-white">{t('legal.audits')}</h2>
         <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{selectedYear}</p>
@@ -203,7 +204,7 @@ function AuditsTab() {
           </thead>
           <tbody>
             {items.map((a: any, idx: number) => (
-              <tr key={a.id || idx} className="border-b border-slate-100/40 hover:bg-blue-50/30 dark:border-slate-700/20 dark:hover:bg-slate-700/20 transition-colors duration-150">
+              <tr key={a.id || idx} className="border-b border-slate-100/40 transition-colors duration-150 hover:bg-blue-50/30 dark:border-slate-700/20 dark:hover:bg-slate-700/20">
                 <td className="px-6 py-3 text-sm font-medium text-slate-700 dark:text-slate-300">{a.entity_name || a.name}</td>
                 <td className="px-6 py-3 text-sm text-slate-500 dark:text-slate-400">{a.auditor || a.audit_firm || '-'}</td>
                 <td className="px-6 py-3 text-sm text-slate-500 dark:text-slate-400">{a.audit_type || a.type || '-'}</td>
@@ -229,7 +230,7 @@ export function LegalPage() {
   ];
 
   return (
-    <div className="space-y-6 animate-in">
+    <div className="page-enter space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight font-display text-slate-900 dark:text-white">
           {t('legal.title')}
@@ -239,16 +240,16 @@ export function LegalPage() {
         </p>
       </div>
 
-      <div className="flex gap-2">
+      <div className="segmented-control">
         {TAB_DEFS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              'inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200',
+              'inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-all duration-200',
               activeTab === tab.key
-                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                : 'glass-card !rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
             )}
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

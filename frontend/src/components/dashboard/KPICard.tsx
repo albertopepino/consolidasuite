@@ -32,16 +32,14 @@ export function KPICard({ data, className, index = 0 }: KPICardProps) {
     <div
       className={cn(
         'group relative overflow-hidden glass-card p-5',
-        'transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-card-hover',
-        'opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]',
+        'transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glass-hover',
         className
       )}
       style={{
         animationDelay: `${index * 60}ms`,
-        animationFillMode: 'backwards',
       }}
     >
-      {/* Left accent bar */}
+      {/* Left accent bar (4px gradient) */}
       <div className={cn(
         'absolute left-0 top-0 h-full w-1 rounded-l-2xl bg-gradient-to-b',
         colors.accent
@@ -67,7 +65,7 @@ export function KPICard({ data, className, index = 0 }: KPICardProps) {
 
         {/* Content */}
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
             {label}
           </p>
           <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white font-display">
@@ -76,18 +74,20 @@ export function KPICard({ data, className, index = 0 }: KPICardProps) {
         </div>
       </div>
 
-      {/* Bottom info */}
+      {/* Benchmark row at bottom */}
       {benchmark !== undefined && (
         <div className="relative mt-3 ml-2 flex items-center gap-2 border-t border-slate-100/60 pt-3 dark:border-slate-700/30">
           <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
             {t('kpi.benchmark')}: {benchmark.toFixed(1)}
           </span>
           {data.value > benchmark === data.isPositiveGood ? (
-            <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+            <span className="pill-green">
+              <span className="dot" />
               {t('kpi.aboveTarget')}
             </span>
           ) : (
-            <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+            <span className="pill-amber">
+              <span className="dot" />
               {t('kpi.belowTarget')}
             </span>
           )}

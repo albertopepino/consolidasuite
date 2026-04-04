@@ -44,30 +44,25 @@ function getGreeting(): string {
 }
 
 /* ── Gradient KPI Card (top row - bold colored backgrounds) ─────────── */
-const GRADIENT_CARD_STYLES: Record<string, { gradient: string; glow: string }> = {
-  'revenue':      { gradient: 'from-[#0c3a5f] to-[#1a6fb5]', glow: 'shadow-blue-500/25' },
-  'gross-margin': { gradient: 'from-[#0d5c3f] to-[#22c55e]', glow: 'shadow-emerald-500/25' },
-  'ebitda':       { gradient: 'from-[#134e5e] to-[#2d92d9]', glow: 'shadow-teal-500/25' },
-  'net-margin':   { gradient: 'from-[#3b1f6e] to-[#8b5cf6]', glow: 'shadow-violet-500/25' },
-};
-
 function GradientKPICard({ data, index }: { data: KPICardData; index: number }) {
-  const style = GRADIENT_CARD_STYLES[data.id] || GRADIENT_CARD_STYLES['revenue'];
+  const gradients: Record<string, string> = {
+    'revenue':      'from-brand-700 to-brand-500',
+    'gross-margin': 'from-emerald-600 to-emerald-500',
+    'ebitda':       'from-teal-600 to-cyan-500',
+    'net-margin':   'from-violet-600 to-violet-500',
+  };
+  const gradient = gradients[data.id] || gradients['revenue'];
+
   return (
     <div
-      className={`
-        group relative overflow-hidden rounded-2xl bg-gradient-to-br ${style.gradient}
-        p-6 text-white shadow-xl ${style.glow}
-        transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl
-        opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]
-      `}
-      style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'backwards' }}
+      className={`gradient-card group relative overflow-hidden rounded-2xl bg-gradient-to-br ${gradient} p-6 text-white shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl`}
+      style={{ animationDelay: `${index * 80}ms` }}
     >
       {/* Decorative blur orb */}
       <div className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-white/10 blur-2xl transition-transform duration-500 group-hover:scale-125" />
       <div className="pointer-events-none absolute -bottom-4 -left-4 h-20 w-20 rounded-full bg-white/5 blur-xl" />
 
-      <p className="relative text-[11px] font-semibold uppercase tracking-[0.15em] text-white/70">
+      <p className="relative text-xs font-semibold uppercase tracking-widest text-white/70">
         {data.label}
       </p>
       <p className="relative mt-2 text-3xl font-bold tracking-tight font-display">
@@ -209,25 +204,24 @@ export function DashboardPage() {
   // Hero highlight values
   const heroRevenue = kpiCards.find((k) => k.id === 'revenue')?.formattedValue || '--';
   const heroNetMargin = kpiCards.find((k) => k.id === 'net-margin')?.formattedValue || '--';
+  const heroEbitda = kpiCards.find((k) => k.id === 'ebitda')?.formattedValue || '--';
 
   return (
-    <div className="space-y-8 animate-in">
+    <div className="page-enter space-y-8">
 
       {/* ═══════════════════════════════════════════════════════════════
           HERO BANNER
           ═══════════════════════════════════════════════════════════════ */}
-      <div
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0c3a5f] via-[#134e6e] to-[#1a6fb5] px-8 py-8 text-white shadow-2xl shadow-blue-900/20 opacity-0 animate-[fadeIn_0.6s_ease-out_forwards]"
-      >
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-800 to-brand-600 px-8 py-8 text-white shadow-2xl shadow-brand-900/20">
         {/* Decorative blur circles */}
-        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[#2d92d9]/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 left-1/4 h-56 w-56 rounded-full bg-[#5cb85c]/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 left-1/4 h-56 w-56 rounded-full bg-accent-400/10 blur-3xl" />
         <div className="pointer-events-none absolute right-1/3 top-0 h-32 w-32 rounded-full bg-white/5 blur-2xl" />
 
         <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           {/* Left: Greeting */}
           <div>
-            <h1 className="text-3xl font-bold tracking-tight font-display md:text-4xl">
+            <h1 className="text-2xl font-bold tracking-tight font-display text-white md:text-3xl">
               {getGreeting()}{firstName ? `, ${firstName}` : ''}
             </h1>
             <p className="mt-2 text-sm text-white/60">
@@ -243,20 +237,18 @@ export function DashboardPage() {
           </div>
 
           {/* Right: Hero highlight numbers */}
-          <div className="flex gap-8 md:gap-12">
-            <div className="opacity-0 animate-[fadeIn_0.5s_ease-out_0.3s_forwards]">
+          <div className="flex gap-8 md:gap-12 stagger-children">
+            <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">{t('kpi.revenue')}</p>
-              <p className="mt-1 text-2xl font-bold tracking-tight font-display md:text-3xl">{heroRevenue}</p>
+              <p className="mt-1 text-2xl font-bold tracking-tight font-display md:text-3xl font-mono tabular-nums">{heroRevenue}</p>
             </div>
-            <div className="opacity-0 animate-[fadeIn_0.5s_ease-out_0.45s_forwards]">
+            <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">{t('kpi.netProfitMargin')}</p>
-              <p className="mt-1 text-2xl font-bold tracking-tight font-display md:text-3xl">{heroNetMargin}</p>
+              <p className="mt-1 text-2xl font-bold tracking-tight font-display md:text-3xl font-mono tabular-nums">{heroNetMargin}</p>
             </div>
-            <div className="opacity-0 animate-[fadeIn_0.5s_ease-out_0.6s_forwards]">
+            <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50">{t('kpi.ebitda')}</p>
-              <p className="mt-1 text-2xl font-bold tracking-tight font-display md:text-3xl">
-                {kpiCards.find((k) => k.id === 'ebitda')?.formattedValue || '--'}
-              </p>
+              <p className="mt-1 text-2xl font-bold tracking-tight font-display md:text-3xl font-mono tabular-nums">{heroEbitda}</p>
             </div>
           </div>
         </div>
@@ -266,12 +258,11 @@ export function DashboardPage() {
           PRIMARY KPI CARDS (Gradient backgrounds)
           ═══════════════════════════════════════════════════════════════ */}
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-5 lg:grid-cols-4 stagger-children">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
               className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-200 to-slate-100 p-6 dark:from-slate-800 dark:to-slate-700"
-              style={{ animationDelay: `${i * 60}ms` }}
             >
               <div className="h-3 w-20 animate-pulse rounded-md bg-slate-300/50 dark:bg-slate-600/50" />
               <div className="mt-4 h-8 w-28 animate-pulse rounded-md bg-slate-300/50 dark:bg-slate-600/50" />
@@ -279,7 +270,7 @@ export function DashboardPage() {
           ))}
         </div>
       ) : gradientCards.length > 0 ? (
-        <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-5 lg:grid-cols-4 stagger-children">
           {gradientCards.map((kpi, index) => (
             <GradientKPICard key={kpi.id} data={kpi} index={index} />
           ))}
@@ -287,12 +278,12 @@ export function DashboardPage() {
       ) : null}
 
       {/* ═══════════════════════════════════════════════════════════════
-          SECONDARY KPI CARDS (Glass/white with accent bar)
+          SECONDARY KPI CARDS (Glass with accent bar)
           ═══════════════════════════════════════════════════════════════ */}
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-5 lg:grid-cols-4 stagger-children">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="glass-card p-5" style={{ animationDelay: `${(i + 4) * 60}ms` }}>
+            <div key={i} className="glass-card p-5">
               <div className="flex items-start gap-4">
                 <div className="h-11 w-11 animate-pulse rounded-xl bg-slate-200/50 dark:bg-slate-700/50" />
                 <div className="flex-1 space-y-3 pt-1">
@@ -304,7 +295,7 @@ export function DashboardPage() {
           ))}
         </div>
       ) : glassCards.length > 0 ? (
-        <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-5 lg:grid-cols-4 stagger-children">
           {glassCards.map((kpi, index) => (
             <KPICard key={kpi.id} data={kpi} index={index + 4} />
           ))}
@@ -317,7 +308,7 @@ export function DashboardPage() {
           <svg className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
-          <h3 className="mt-4 text-lg font-semibold text-slate-700 dark:text-slate-300">No financial data</h3>
+          <h3 className="mt-4 text-lg font-semibold font-display text-slate-700 dark:text-slate-300">No financial data</h3>
           <p className="mt-1 text-sm text-slate-500">Select a period with uploaded financial statements (Jul-Dec 2025)</p>
         </div>
       )}
@@ -327,7 +318,7 @@ export function DashboardPage() {
           ═══════════════════════════════════════════════════════════════ */}
       <div>
         <div className="mb-5 flex items-center gap-3">
-          <h2 className="text-xl font-bold font-display bg-gradient-to-r from-[#0c3a5f] to-[#1a6fb5] bg-clip-text text-transparent dark:from-blue-300 dark:to-teal-300">
+          <h2 className="text-xl font-bold font-display bg-gradient-to-r from-brand-700 to-brand-500 bg-clip-text text-transparent dark:from-blue-300 dark:to-teal-300">
             {t('dashboard.performanceOverview')}
           </h2>
           <div className="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent dark:from-slate-700" />
@@ -340,7 +331,7 @@ export function DashboardPage() {
           ═══════════════════════════════════════════════════════════════ */}
       <button
         onClick={() => setShowCustomize(true)}
-        className="fixed bottom-8 right-8 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#1a6fb5] to-[#2d92d9] text-white shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-110 hover:shadow-xl hover:shadow-blue-500/40 active:scale-95"
+        className="btn-primary fixed bottom-8 right-8 z-40 flex h-14 w-14 items-center justify-center !rounded-2xl !p-0 shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl active:scale-95"
         title={t('dashboard.customize')}
       >
         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -365,7 +356,7 @@ export function DashboardPage() {
               <h2 className="text-lg font-semibold font-display text-slate-900 dark:text-white">{t('dashboard.customize')}</h2>
               <button
                 onClick={() => setShowCustomize(false)}
-                className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100/60 hover:text-slate-600 dark:hover:bg-slate-700/50 dark:hover:text-slate-300 transition-all duration-150"
+                className="btn-ghost !p-1.5 !rounded-xl"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -376,7 +367,7 @@ export function DashboardPage() {
             <div className="space-y-6">
               {/* KPI Cards Section */}
               <div>
-                <h3 className="label font-display">
+                <h3 className="input-label font-display">
                   {t('dashboard.kpiCards')}
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
@@ -399,7 +390,7 @@ export function DashboardPage() {
 
               {/* Chart Widgets Section */}
               <div>
-                <h3 className="label font-display">
+                <h3 className="input-label font-display">
                   {t('dashboard.chartWidgets')}
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
@@ -427,13 +418,13 @@ export function DashboardPage() {
                   setVisibleKPIs(ALL_KPI_OPTIONS.map((k) => k.id));
                   setVisibleWidgets(ALL_WIDGET_OPTIONS.map((w) => w.id));
                 }}
-                className="btn-secondary !px-4 !py-2 !text-sm"
+                className="btn-glass"
               >
                 {t('dashboard.resetDefault')}
               </button>
               <button
                 onClick={() => setShowCustomize(false)}
-                className="btn-primary !px-5 !py-2 !text-sm"
+                className="btn-primary"
               >
                 {t('dashboard.done')}
               </button>

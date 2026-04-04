@@ -185,7 +185,7 @@ export function UploadForm() {
           dragActive
             ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/10'
             : 'border-slate-300 hover:border-slate-400 dark:border-slate-600 dark:hover:border-slate-500',
-          fileError && 'border-negative-400'
+          fileError && 'border-red-400'
         )}
       >
         <input
@@ -224,7 +224,7 @@ export function UploadForm() {
       </div>
 
       {fileError && (
-        <p className="text-sm text-negative-600">{fileError}</p>
+        <p className="text-sm text-red-600">{fileError}</p>
       )}
 
       {/* Upload progress */}
@@ -244,7 +244,7 @@ export function UploadForm() {
 
       {/* Upload results */}
       {uploadResult && (
-        <Card padding="md">
+        <Card>
           <div className="flex items-center gap-2 mb-3">
             {uploadResult.success ? (
               <Badge variant="positive">Upload Successful</Badge>
@@ -258,10 +258,10 @@ export function UploadForm() {
 
           {uploadResult.errors.length > 0 && (
             <div className="mt-3">
-              <h4 className="text-sm font-medium text-negative-700 mb-2">Errors</h4>
+              <h4 className="text-sm font-medium text-red-700 mb-2">Errors</h4>
               <ul className="space-y-1">
                 {uploadResult.errors.map((err, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-negative-600">
+                  <li key={i} className="flex items-start gap-2 text-xs text-red-600">
                     <span className="shrink-0 mt-0.5">
                       <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -308,7 +308,7 @@ export function UploadForm() {
       </div>
 
       {uploadMutation.isError && (
-        <p className="text-sm text-negative-600">
+        <p className="text-sm text-red-600">
           Upload failed: {uploadMutation.error instanceof Error ? uploadMutation.error.message : 'Unknown error'}
         </p>
       )}

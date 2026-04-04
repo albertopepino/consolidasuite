@@ -44,7 +44,6 @@ const CATEGORY_STYLES: Record<string, {
   headerGradient: string;
   headerText: string;
   dot: string;
-  borderAccent: string;
   chipBg: string;
   chipText: string;
 }> = {
@@ -52,7 +51,6 @@ const CATEGORY_STYLES: Record<string, {
     headerGradient: 'bg-gradient-to-r from-emerald-500 to-emerald-600',
     headerText: 'text-white',
     dot: 'bg-emerald-400',
-    borderAccent: 'border-l-emerald-500',
     chipBg: 'bg-emerald-500/10',
     chipText: 'text-emerald-600 dark:text-emerald-400',
   },
@@ -60,7 +58,6 @@ const CATEGORY_STYLES: Record<string, {
     headerGradient: 'bg-gradient-to-r from-blue-500 to-blue-600',
     headerText: 'text-white',
     dot: 'bg-blue-400',
-    borderAccent: 'border-l-blue-500',
     chipBg: 'bg-blue-500/10',
     chipText: 'text-blue-600 dark:text-blue-400',
   },
@@ -68,7 +65,6 @@ const CATEGORY_STYLES: Record<string, {
     headerGradient: 'bg-gradient-to-r from-violet-500 to-violet-600',
     headerText: 'text-white',
     dot: 'bg-violet-400',
-    borderAccent: 'border-l-violet-500',
     chipBg: 'bg-violet-500/10',
     chipText: 'text-violet-600 dark:text-violet-400',
   },
@@ -76,7 +72,6 @@ const CATEGORY_STYLES: Record<string, {
     headerGradient: 'bg-gradient-to-r from-amber-500 to-amber-600',
     headerText: 'text-white',
     dot: 'bg-amber-400',
-    borderAccent: 'border-l-amber-500',
     chipBg: 'bg-amber-500/10',
     chipText: 'text-amber-600 dark:text-amber-400',
   },
@@ -199,9 +194,9 @@ export function TargetsPage() {
   }, [kpiData, targetValues]);
 
   return (
-    <div className="min-h-screen animate-in">
-      {/* ── Gradient Header ─────────────────────────────────────────────── */}
-      <div className="relative -mx-6 -mt-6 mb-8 overflow-hidden rounded-b-3xl bg-gradient-to-r from-[#1a6fb5] via-[#1a8f85] to-[#34c759] px-8 pb-8 pt-10 shadow-xl shadow-[#1a6fb5]/10">
+    <div className="page-enter min-h-screen">
+      {/* ── Gradient Header Banner ─────────────────────────────────────── */}
+      <div className="relative -mx-6 -mt-6 mb-8 overflow-hidden rounded-b-3xl bg-gradient-to-r from-brand-600 to-accent-400 px-8 pb-8 pt-10 shadow-xl shadow-brand-600/10">
         {/* Decorative circles */}
         <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/5" />
         <div className="pointer-events-none absolute -left-8 bottom-0 h-40 w-40 rounded-full bg-white/5" />
@@ -240,12 +235,12 @@ export function TargetsPage() {
         </div>
       </div>
 
-      {/* ── Stats Bar ───────────────────────────────────────────────────── */}
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      {/* ── Stats Bar (3 glass-cards) ──────────────────────────────────── */}
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3 stagger-children">
         {/* Total KPIs tracked */}
-        <div className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/60 p-5 shadow-lg shadow-slate-200/50 backdrop-blur-xl transition-all hover:shadow-xl dark:border-white/5 dark:bg-slate-800/50 dark:shadow-slate-900/30">
+        <div className="glass-card group relative overflow-hidden p-5 transition-all hover:shadow-glass-hover">
           <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-gradient-to-br from-blue-500/10 to-transparent" />
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
             KPIs Tracked
           </p>
           <p className="mt-2 font-display text-3xl font-bold text-slate-900 dark:text-white">
@@ -255,14 +250,14 @@ export function TargetsPage() {
         </div>
 
         {/* On Track */}
-        <div className="group relative overflow-hidden rounded-2xl border border-emerald-200/40 bg-white/60 p-5 shadow-lg shadow-emerald-100/30 backdrop-blur-xl transition-all hover:shadow-xl dark:border-emerald-500/10 dark:bg-slate-800/50 dark:shadow-emerald-900/10">
+        <div className="glass-card group relative overflow-hidden p-5 transition-all hover:shadow-glass-hover">
           <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-gradient-to-br from-emerald-500/10 to-transparent" />
           <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
             </span>
-            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+            <p className="text-xs font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
               {t('targets.onTrack')}
             </p>
           </div>
@@ -272,14 +267,14 @@ export function TargetsPage() {
         </div>
 
         {/* Below Target */}
-        <div className="group relative overflow-hidden rounded-2xl border border-red-200/40 bg-white/60 p-5 shadow-lg shadow-red-100/30 backdrop-blur-xl transition-all hover:shadow-xl dark:border-red-500/10 dark:bg-slate-800/50 dark:shadow-red-900/10">
+        <div className="glass-card group relative overflow-hidden p-5 transition-all hover:shadow-glass-hover">
           <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-gradient-to-br from-red-500/10 to-transparent" />
           <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
             </span>
-            <p className="text-xs font-semibold uppercase tracking-wider text-red-600 dark:text-red-400">
+            <p className="text-xs font-semibold uppercase tracking-widest text-red-600 dark:text-red-400">
               {t('targets.belowTarget')}
             </p>
           </div>
@@ -315,15 +310,15 @@ export function TargetsPage() {
           </div>
         </div>
       ) : (
-        /* ── Category Sections ────────────────────────────────────────── */
-        <div className="space-y-8">
+        /* ── Category Sections (glass-card with colored header strip) ── */
+        <div className="space-y-8 stagger-children">
           {CATEGORIES.map((category) => {
             const kpis = kpisByCategory[category];
             const style = CATEGORY_STYLES[category];
             return (
               <div
                 key={category}
-                className="overflow-hidden rounded-2xl border border-white/20 bg-white/60 shadow-lg shadow-slate-200/40 backdrop-blur-xl dark:border-white/5 dark:bg-slate-800/40 dark:shadow-slate-900/20"
+                className="glass-card overflow-hidden"
               >
                 {/* Colored header strip */}
                 <div className={cn('flex items-center gap-3 px-6 py-4', style.headerGradient)}>
@@ -356,7 +351,7 @@ export function TargetsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {kpis.map((kpi, rowIdx) => {
+                      {kpis.map((kpi) => {
                         const currentValue = findKPIValue(kpiData, kpi.apiCategory, kpi.name);
                         const targetVal = targetValues[kpi.name] || '';
                         const status = getStatus(currentValue, targetVal);
@@ -364,7 +359,6 @@ export function TargetsPage() {
                           <tr
                             key={kpi.name}
                             className="group border-b border-slate-50 transition-all duration-200 hover:bg-slate-50/80 dark:border-slate-700/30 dark:hover:bg-slate-700/20"
-                            style={{ animationDelay: `${rowIdx * 40}ms` }}
                           >
                             {/* KPI Name */}
                             <td className="px-6 py-3.5">
@@ -395,32 +389,29 @@ export function TargetsPage() {
                                 value={targetVal}
                                 onChange={(e) => handleTargetChange(kpi.name, e.target.value)}
                                 placeholder="--"
-                                className="mx-auto block w-28 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-center font-mono text-sm tabular-nums text-slate-700 shadow-sm transition-all placeholder:text-slate-300 focus:border-[#1a6fb5] focus:ring-2 focus:ring-[#1a6fb5]/20 focus:shadow-md dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300 dark:placeholder:text-slate-600 dark:focus:border-[#1a8f85] dark:focus:ring-[#1a8f85]/20"
+                                className="input mx-auto block w-28 text-center font-mono tabular-nums"
                               />
                             </td>
 
                             {/* Status */}
                             <td className="px-6 py-3.5 text-center">
                               {status === 'on-track' && (
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                                  <svg className="h-4 w-4 animate-[bounce_1s_ease-in-out_1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <span className="pill-green">
+                                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                                   </svg>
                                   {t('targets.onTrack')}
                                 </span>
                               )}
                               {status === 'below-target' && (
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-600 dark:text-red-400">
-                                  <span className="relative flex h-2 w-2">
-                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
-                                  </span>
+                                <span className="pill-red">
+                                  <span className="dot" />
                                   {t('targets.belowTarget')}
                                 </span>
                               )}
                               {status === 'no-data' && (
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-400 dark:bg-slate-700/50 dark:text-slate-500">
-                                  <span className="h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />
+                                <span className="pill-slate">
+                                  <span className="dot" />
                                   --
                                 </span>
                               )}
@@ -437,11 +428,11 @@ export function TargetsPage() {
         </div>
       )}
 
-      {/* ── Floating Save FAB ───────────────────────────────────────────── */}
+      {/* ── Floating Save FAB (gradient btn, fixed bottom-right) ───────── */}
       <button
         onClick={handleSave}
         disabled={isSaving}
-        className="fixed bottom-8 right-8 z-50 inline-flex h-14 items-center gap-2.5 rounded-full bg-gradient-to-r from-[#1a6fb5] to-[#34c759] px-7 text-sm font-bold text-white shadow-2xl shadow-[#1a6fb5]/30 transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_40px_rgba(26,111,181,0.4)] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+        className="fixed bottom-8 right-8 z-50 inline-flex h-14 items-center gap-2.5 rounded-full bg-gradient-to-r from-brand-600 to-accent-400 px-7 text-sm font-bold text-white shadow-2xl shadow-brand-600/30 transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_40px_rgba(26,111,181,0.4)] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
         {isSaving ? (
           <>

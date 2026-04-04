@@ -112,16 +112,31 @@ const navGroups: NavGroup[] = [
   },
 ];
 
+function NavIcon({ d }: { d: string }) {
+  return (
+    <svg
+      className="h-4 w-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.5}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d={d} />
+    </svg>
+  );
+}
+
 function NavItemLink({ item }: { item: NavItem }) {
   const { t } = useTranslation();
+
   return (
     <NavLink
       to={item.path}
       className={({ isActive }) =>
         cn(
-          'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200',
+          'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200',
           isActive
-            ? 'bg-gradient-to-r from-brand-500/20 to-brand-400/5 text-white'
+            ? 'bg-brand-500/15 text-white'
             : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
         )
       }
@@ -130,25 +145,17 @@ function NavItemLink({ item }: { item: NavItem }) {
         <>
           <div
             className={cn(
-              'flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-200',
+              'h-8 w-8 rounded-lg flex items-center justify-center transition-all duration-200',
               isActive
-                ? 'bg-brand-500 shadow-[0_0_12px_rgba(26,111,181,0.5)]'
+                ? 'bg-brand-500 shadow-glow-brand'
                 : 'bg-white/[0.05] group-hover:bg-white/[0.08]'
             )}
           >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.5}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
-            </svg>
+            <NavIcon d={item.icon} />
           </div>
-          <span>{t(item.translationKey)}</span>
+          <span className="truncate">{t(item.translationKey)}</span>
           {isActive && (
-            <div className="ml-auto h-1.5 w-1.5 rounded-full bg-blue-400 shadow-[0_0_6px_rgba(96,165,250,0.8)]" />
+            <div className="ml-auto h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-400 shadow-[0_0_6px_rgba(26,111,181,0.7)]" />
           )}
         </>
       )}
@@ -167,9 +174,9 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="flex w-[220px] flex-col h-screen sticky top-0 bg-[#0f1629] text-white">
+    <aside className="flex w-[220px] flex-shrink-0 flex-col h-screen sticky top-0 bg-surface-dark text-white">
       {/* Logo */}
-      <div className="flex items-center justify-center px-4 pt-6 pb-6">
+      <div className="flex items-center justify-center px-4 pt-6 pb-5">
         <img
           src="/logo.png"
           alt="ConsolidaSuite"
@@ -177,19 +184,18 @@ export function Sidebar() {
         />
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 pb-2">
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto scrollbar-thin px-3 pb-2">
         {navGroups.map((group, idx) => (
           <div key={group.labelKey}>
-            {/* Separator between groups */}
             {idx > 0 && <div className="mx-2 my-2 border-t border-white/[0.06]" />}
 
-            {/* Group label */}
+            {/* Group header with collapse toggle */}
             <button
               onClick={() => toggleGroup(group.labelKey)}
               className="flex w-full items-center justify-between px-3 py-1.5 mb-0.5"
             >
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+              <span className="text-[10px] uppercase tracking-[0.15em] text-slate-500 font-semibold">
                 {t(group.labelKey)}
               </span>
               <svg
@@ -206,7 +212,7 @@ export function Sidebar() {
               </svg>
             </button>
 
-            {/* Group items */}
+            {/* Collapsible items */}
             {expanded[group.labelKey] && (
               <div className="space-y-0.5">
                 {group.items.map((item) => (
@@ -218,12 +224,14 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Bottom: version/branding */}
+      {/* Footer */}
       <div className="px-5 py-4 border-t border-white/[0.04]">
-        <div className="text-[10px] text-slate-500">
+        <div className="text-[10px] text-slate-600">
           ConsolidaSuite {t('common.version')} 1.0
         </div>
-        <div className="text-[10px] text-slate-600">{t('common.gdprCompliant')}</div>
+        <div className="text-[10px] text-slate-700 mt-0.5">
+          {t('common.gdprCompliant')}
+        </div>
       </div>
     </aside>
   );

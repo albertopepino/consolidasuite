@@ -11,18 +11,18 @@ import {
 import type { GroupAccountResponse, SiteAccountResponse } from '@/api/hooks';
 import { useTranslation } from '@/i18n/useTranslation';
 
-const ACCOUNT_TYPE_COLORS: Record<string, { bg: string; text: string }> = {
-  asset: { bg: 'bg-blue-50 dark:bg-blue-900/20', text: 'text-blue-700 dark:text-blue-400' },
-  liability: { bg: 'bg-red-50 dark:bg-red-900/20', text: 'text-red-700 dark:text-red-400' },
-  equity: { bg: 'bg-purple-50 dark:bg-purple-900/20', text: 'text-purple-700 dark:text-purple-400' },
-  revenue: { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-700 dark:text-emerald-400' },
-  expense: { bg: 'bg-amber-50 dark:bg-amber-900/20', text: 'text-amber-700 dark:text-amber-400' },
+const ACCOUNT_TYPE_PILL: Record<string, string> = {
+  asset: 'pill-blue',
+  liability: 'pill-red',
+  equity: 'pill-violet',
+  revenue: 'pill-green',
+  expense: 'pill-amber',
 };
 
 function AccountTypeBadge({ type }: { type: string }) {
-  const colors = ACCOUNT_TYPE_COLORS[type] || { bg: 'bg-slate-50', text: 'text-slate-600' };
+  const pill = ACCOUNT_TYPE_PILL[type] || 'pill-slate';
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium capitalize ${colors.bg} ${colors.text}`}>
+    <span className={`${pill} capitalize`}>
       {type}
     </span>
   );
@@ -49,7 +49,7 @@ function SmallSpinner() {
 function MessageBanner({ message }: { message: { type: 'success' | 'error'; text: string } }) {
   return (
     <div
-      className={`rounded-lg px-4 py-3 text-sm font-medium ${
+      className={`rounded-xl px-4 py-3 text-sm font-medium ${
         message.type === 'success'
           ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400'
           : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
@@ -82,7 +82,7 @@ export function ChartOfAccountsPage() {
   ];
 
   return (
-    <div className="space-y-6 animate-in">
+    <div className="page-enter space-y-6">
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight font-display text-slate-900 dark:text-white">
@@ -93,17 +93,13 @@ export function ChartOfAccountsPage() {
         </p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2">
+      {/* Segmented Control Tabs */}
+      <div className="segmented-control">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
-              activeTab === tab.key
-                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                : 'glass-card !rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-            }`}
+            className={activeTab === tab.key ? 'active' : ''}
           >
             {tab.label}
           </button>
@@ -139,7 +135,6 @@ function GroupAccountsTab() {
     } catch {
       setUploadMessage({ type: 'error', text: 'Failed to upload file. Please check the format and try again.' });
     }
-    // Reset file input so same file can be re-uploaded
     if (fileInputRef.current) fileInputRef.current.value = '';
   }, [uploadMutation]);
 
@@ -181,7 +176,7 @@ function GroupAccountsTab() {
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploadMutation.isPending}
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-primary"
         >
           {uploadMutation.isPending ? (
             <>
@@ -199,7 +194,7 @@ function GroupAccountsTab() {
         </button>
         <button
           onClick={downloadTemplate}
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+          className="btn-ghost"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -211,14 +206,14 @@ function GroupAccountsTab() {
       {uploadMessage && <MessageBanner message={uploadMessage} />}
 
       {sections.map((section) => {
-        const colors = ACCOUNT_TYPE_COLORS[section.type] || { bg: 'bg-slate-50', text: 'text-slate-600' };
+        const sectionPill = ACCOUNT_TYPE_PILL[section.type] || 'pill-slate';
         return (
           <div key={section.type} className="glass-card overflow-hidden">
             {/* Section Header */}
-            <div className={`flex items-center gap-2 px-5 py-3 ${colors.bg} border-b border-slate-200 dark:border-slate-700`}>
-              <h3 className={`text-sm font-semibold font-display capitalize ${colors.text}`}>{section.type}</h3>
-              <span className="text-xs text-slate-400 dark:text-slate-500">
-                ({section.accounts.length} accounts)
+            <div className="flex items-center gap-2 px-5 py-3 border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/50">
+              <h3 className={`text-sm font-semibold font-display capitalize text-slate-700 dark:text-slate-200`}>{section.type}</h3>
+              <span className={`${sectionPill} !text-[10px]`}>
+                {section.accounts.length} accounts
               </span>
             </div>
 
@@ -227,16 +222,16 @@ function GroupAccountsTab() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-slate-100 dark:border-slate-700">
-                    <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                       {t('accounts.code')}
                     </th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                       {t('accounts.name')}
                     </th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                       {t('accounts.type')}
                     </th>
-                    <th className="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <th className="px-5 py-3 text-center text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                       {t('common.status')}
                     </th>
                   </tr>
@@ -268,11 +263,12 @@ function GroupAccountsTab() {
                       </td>
                       <td className="px-5 py-3 text-center">
                         {acct.is_active ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                          <span className="pill-green">
+                            <span className="dot" />
                             {t('common.active')}
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500 dark:bg-slate-700 dark:text-slate-400">
+                          <span className="pill-slate">
                             {t('common.inactive')}
                           </span>
                         )}
@@ -334,11 +330,11 @@ function SiteAccountsTab() {
       {/* Controls */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-slate-500 dark:text-slate-400">Site</label>
+          <label className="input-label">Site</label>
           <select
             value={siteId}
             onChange={(e) => { setSiteId(e.target.value); setUploadMessage(null); }}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
+            className="input"
           >
             <option value="">{t('common.selectSite')}</option>
             {sites?.map((site) => (
@@ -360,7 +356,7 @@ function SiteAccountsTab() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadMutation.isPending}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary"
               >
                 {uploadMutation.isPending ? (
                   <>
@@ -378,7 +374,7 @@ function SiteAccountsTab() {
               </button>
               <button
                 onClick={downloadTemplate}
-                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                className="btn-ghost"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -394,7 +390,7 @@ function SiteAccountsTab() {
 
       {/* No site selected */}
       {!siteId && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50/50 py-16 dark:border-slate-600 dark:bg-slate-800/50">
+        <div className="glass-card border-dashed flex flex-col items-center justify-center py-16">
           <svg className="h-12 w-12 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
           </svg>
@@ -416,23 +412,23 @@ function SiteAccountsTab() {
 
       {/* Account tables */}
       {siteId && !isLoading && sections.map((section) => {
-        const colors = ACCOUNT_TYPE_COLORS[section.type] || { bg: 'bg-slate-50', text: 'text-slate-600' };
+        const sectionPill = ACCOUNT_TYPE_PILL[section.type] || 'pill-slate';
         return (
           <div key={section.type} className="glass-card overflow-hidden">
-            <div className={`flex items-center gap-2 px-5 py-3 ${colors.bg} border-b border-slate-200 dark:border-slate-700`}>
-              <h3 className={`text-sm font-semibold font-display capitalize ${colors.text}`}>{section.type}</h3>
-              <span className="text-xs text-slate-400 dark:text-slate-500">
-                ({section.accounts.length} accounts)
+            <div className="flex items-center gap-2 px-5 py-3 border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/50">
+              <h3 className="text-sm font-semibold font-display capitalize text-slate-700 dark:text-slate-200">{section.type}</h3>
+              <span className={`${sectionPill} !text-[10px]`}>
+                {section.accounts.length} accounts
               </span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-slate-100 dark:border-slate-700">
-                    <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t('accounts.code')}</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t('accounts.name')}</th>
-                    <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t('accounts.type')}</th>
-                    <th className="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t('common.status')}</th>
+                    <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">{t('accounts.code')}</th>
+                    <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">{t('accounts.name')}</th>
+                    <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">{t('accounts.type')}</th>
+                    <th className="px-5 py-3 text-center text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">{t('common.status')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 dark:divide-slate-700/50">
@@ -450,9 +446,14 @@ function SiteAccountsTab() {
                       <td className="px-5 py-3"><AccountTypeBadge type={acct.account_type} /></td>
                       <td className="px-5 py-3 text-center">
                         {acct.is_active ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">{t('common.active')}</span>
+                          <span className="pill-green">
+                            <span className="dot" />
+                            {t('common.active')}
+                          </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500 dark:bg-slate-700 dark:text-slate-400">{t('common.inactive')}</span>
+                          <span className="pill-slate">
+                            {t('common.inactive')}
+                          </span>
                         )}
                       </td>
                     </tr>
@@ -490,8 +491,6 @@ function MappingMatrixTab() {
       const mapped: Record<string, string> = {};
       for (const entry of mappingEntries) {
         if (entry.group_account) {
-          // entry.site_account maps to entry.group_account
-          // We want: groupAccountId -> siteAccountId
           mapped[entry.group_account.id] = entry.site_account.id;
         }
       }
@@ -518,7 +517,6 @@ function MappingMatrixTab() {
     if (!siteId) return;
     setSaveMessage(null);
     try {
-      // API expects {site_account_id, group_account_id} -- reverse our local mapping
       const mappings = Object.entries(localMappings).map(([groupAccountId, siteAccountId]) => ({
         site_account_id: siteAccountId,
         group_account_id: groupAccountId,
@@ -544,11 +542,11 @@ function MappingMatrixTab() {
       {/* Controls */}
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-medium text-slate-500 dark:text-slate-400">Site</label>
+          <label className="input-label">Site</label>
           <select
             value={siteId}
             onChange={(e) => { setSiteId(e.target.value); setSaveMessage(null); }}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
+            className="input"
           >
             <option value="">{t('common.selectSite')}</option>
             {sites?.map((site) => (
@@ -559,20 +557,19 @@ function MappingMatrixTab() {
 
         {siteId && groupAccounts && (
           <>
-            {/* Stats bar */}
+            {/* Stats bar with pills */}
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 dark:bg-slate-800">
-                <span className="text-xs text-slate-500 dark:text-slate-400">Total:</span>
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{stats.total}</span>
-              </div>
-              <div className="flex items-center gap-1.5 rounded-lg bg-emerald-50 px-3 py-2 dark:bg-emerald-900/20">
-                <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                <span className="text-xs text-emerald-700 dark:text-emerald-400">{t('accounts.mapped')}: {stats.mapped}</span>
-              </div>
-              <div className="flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-2 dark:bg-red-900/20">
-                <div className="h-2 w-2 rounded-full bg-red-500" />
-                <span className="text-xs text-red-700 dark:text-red-400">{t('accounts.unmapped')}: {stats.unmapped}</span>
-              </div>
+              <span className="pill-slate">
+                Total: <strong>{stats.total}</strong>
+              </span>
+              <span className="pill-green">
+                <span className="dot" />
+                {t('accounts.mapped')}: {stats.mapped}
+              </span>
+              <span className="pill-red">
+                <span className="dot" />
+                {t('accounts.unmapped')}: {stats.unmapped}
+              </span>
             </div>
 
             {/* Save button */}
@@ -580,7 +577,7 @@ function MappingMatrixTab() {
               <button
                 onClick={handleSave}
                 disabled={saveMutation.isPending || !hasChanges}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary"
               >
                 {saveMutation.isPending ? (
                   <>
@@ -606,7 +603,7 @@ function MappingMatrixTab() {
 
       {/* No site selected */}
       {!siteId && (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50/50 py-16 dark:border-slate-600 dark:bg-slate-800/50">
+        <div className="glass-card border-dashed flex flex-col items-center justify-center py-16">
           <svg className="h-12 w-12 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
           </svg>
@@ -626,31 +623,31 @@ function MappingMatrixTab() {
         </div>
       )}
 
-      {/* Mapping Matrix Table -- Group accounts as rows, site accounts as dropdown options */}
+      {/* Mapping Matrix Table */}
       {siteId && groupAccounts && !mappingLoading && (
         <div className="glass-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/80">
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                <tr className="border-b border-slate-200 bg-slate-50/50 dark:border-slate-700 dark:bg-slate-800/80">
+                  <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                     Group Code
                   </th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                     Group Account Name
                   </th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                     Type
                   </th>
-                  <th className="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <th className="px-5 py-3 text-center text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                     <svg className="inline h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </th>
-                  <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                     Site Account Mapping
                   </th>
-                  <th className="px-5 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <th className="px-5 py-3 text-center text-[11px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
                     {t('common.status')}
                   </th>
                 </tr>
@@ -689,10 +686,10 @@ function MappingMatrixTab() {
                         <select
                           value={localMappings[ga.id] || ''}
                           onChange={(e) => handleMappingChange(ga.id, e.target.value)}
-                          className={`w-full rounded-lg border px-3 py-1.5 text-sm shadow-sm transition-colors focus:ring-1 focus:ring-blue-500 ${
+                          className={`input w-full ${
                             isMapped
-                              ? 'border-emerald-200 bg-emerald-50/50 text-slate-700 focus:border-blue-500 dark:border-emerald-800 dark:bg-emerald-900/10 dark:text-slate-300'
-                              : 'border-red-200 bg-red-50/50 text-slate-700 focus:border-blue-500 dark:border-red-800 dark:bg-red-900/10 dark:text-slate-300'
+                              ? '!border-emerald-200 !bg-emerald-50/50 dark:!border-emerald-800 dark:!bg-emerald-900/10'
+                              : '!border-red-200 !bg-red-50/50 dark:!border-red-800 dark:!bg-red-900/10'
                           }`}
                         >
                           <option value="">-- Unmapped --</option>
@@ -705,13 +702,13 @@ function MappingMatrixTab() {
                       </td>
                       <td className="px-5 py-3 text-center">
                         {isMapped ? (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          <span className="pill-green">
+                            <span className="dot" />
                             {t('accounts.mapped')}
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-600 dark:text-red-400">
-                            <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                          <span className="pill-red">
+                            <span className="dot" />
                             {t('accounts.unmapped')}
                           </span>
                         )}

@@ -1,40 +1,19 @@
 import { cn } from '@/utils/cn';
 
-interface BadgeProps {
-  variant?: 'positive' | 'negative' | 'neutral' | 'info' | 'warning';
-  size?: 'sm' | 'md';
-  children: React.ReactNode;
-  className?: string;
-}
-
-const variantClasses = {
-  positive: 'bg-positive-50 text-positive-700 dark:bg-positive-700/20 dark:text-positive-400',
-  negative: 'bg-negative-50 text-negative-700 dark:bg-negative-700/20 dark:text-negative-400',
-  neutral: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
-  info: 'bg-blue-50 text-blue-700 dark:bg-blue-700/20 dark:text-blue-400',
-  warning: 'bg-amber-50 text-amber-700 dark:bg-amber-700/20 dark:text-amber-400',
+const VARIANTS = {
+  green: 'pill-green', red: 'pill-red', blue: 'pill-blue',
+  amber: 'pill-amber', violet: 'pill-violet', slate: 'pill-slate',
+  // aliases
+  positive: 'pill-green', negative: 'pill-red', info: 'pill-blue',
+  warning: 'pill-amber', neutral: 'pill-slate',
 };
 
-const sizeClasses = {
-  sm: 'px-1.5 py-0.5 text-xs',
-  md: 'px-2.5 py-1 text-xs',
-};
+interface BadgeProps { variant?: keyof typeof VARIANTS; size?: 'sm' | 'md'; className?: string; children: React.ReactNode; dot?: boolean; pulse?: boolean; }
 
-export function Badge({
-  variant = 'neutral',
-  size = 'md',
-  className,
-  children,
-}: BadgeProps) {
+export function Badge({ variant = 'neutral', size = 'md', className, children, dot, pulse }: BadgeProps) {
   return (
-    <span
-      className={cn(
-        'inline-flex items-center rounded-full font-medium',
-        variantClasses[variant],
-        sizeClasses[size],
-        className
-      )}
-    >
+    <span className={cn(VARIANTS[variant], size === 'sm' && 'text-[10px] px-2 py-0.5', className)}>
+      {dot && <span className={cn('dot', variant === 'green' || variant === 'positive' ? 'dot-green' : variant === 'red' || variant === 'negative' ? 'dot-red' : variant === 'amber' || variant === 'warning' ? 'dot-amber' : 'dot-blue', pulse && 'animate-pulse-soft')} />}
       {children}
     </span>
   );

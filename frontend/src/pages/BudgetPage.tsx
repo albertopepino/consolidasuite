@@ -4,7 +4,7 @@ import { useTranslation } from '@/i18n/useTranslation';
 export function BudgetPage() {
   const { t } = useTranslation();
   return (
-    <div className="space-y-6 animate-in">
+    <div className="page-enter space-y-6">
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>

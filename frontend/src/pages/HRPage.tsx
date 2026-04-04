@@ -7,11 +7,11 @@ import { cn } from '@/utils/cn';
 const TABS = ['headcount', 'payroll', 'upload'] as const;
 type Tab = (typeof TABS)[number];
 
-const EMPLOYMENT_TYPE_STYLES: Record<string, { gradient: string; dot: string }> = {
-  full_time: { gradient: 'bg-gradient-to-r from-blue-500 to-blue-600 text-white', dot: 'bg-blue-200' },
-  part_time: { gradient: 'bg-gradient-to-r from-amber-400 to-amber-500 text-white', dot: 'bg-amber-200' },
-  contractor: { gradient: 'bg-gradient-to-r from-violet-500 to-violet-600 text-white', dot: 'bg-violet-200' },
-  intern: { gradient: 'bg-gradient-to-r from-cyan-400 to-cyan-500 text-white', dot: 'bg-cyan-200' },
+const EMPLOYMENT_TYPE_PILLS: Record<string, string> = {
+  full_time: 'pill-blue',
+  part_time: 'pill-amber',
+  contractor: 'pill-violet',
+  intern: 'pill-green',
 };
 
 function formatCurrency(value: number | null | undefined): string {
@@ -68,7 +68,7 @@ function Spinner() {
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-500">
+    <div className="glass-card flex flex-col items-center justify-center py-20 text-slate-400 dark:text-slate-500">
       <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800">
         <svg className="h-8 w-8 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
@@ -97,7 +97,6 @@ function HeadcountTab({ siteId }: { siteId: string | null }) {
     return <EmptyState message={t('common.noData')} />;
   }
 
-  // Group employees by department
   const byDept: Record<string, any[]> = {};
   for (const emp of employees) {
     const dept = emp.department || 'Unassigned';
@@ -116,7 +115,7 @@ function HeadcountTab({ siteId }: { siteId: string | null }) {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 stagger-children">
       {/* Department cards grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {deptList.map((dept: any, deptIdx: number) => {
@@ -129,8 +128,7 @@ function HeadcountTab({ siteId }: { siteId: string | null }) {
           return (
             <div
               key={deptName}
-              className="group glass-card overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]"
-              style={{ animationDelay: `${deptIdx * 80}ms`, animationFillMode: 'backwards' }}
+              className="glass-card group overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
             >
               <div className={cn('bg-gradient-to-r p-4', gradient)}>
                 <p className="text-xs font-semibold uppercase tracking-widest text-white/70">{t('hr.department')}</p>
@@ -138,12 +136,12 @@ function HeadcountTab({ siteId }: { siteId: string | null }) {
               </div>
               <div className="flex items-center gap-6 p-5">
                 <div className="text-center">
-                  <p className="text-3xl font-bold font-display tabular-nums text-slate-900 dark:text-white">{headcount}</p>
+                  <p className="text-3xl font-bold font-display font-mono tabular-nums text-slate-900 dark:text-white">{headcount}</p>
                   <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400">{t('hr.headcount')}</p>
                 </div>
                 <div className="h-10 w-px bg-slate-200 dark:bg-slate-700" />
                 <div>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                  <span className="pill-blue inline-flex items-center gap-1.5">
                     <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" /></svg>
                     {fte.toFixed ? fte.toFixed(1) : fte} FTE
                   </span>
@@ -155,23 +153,19 @@ function HeadcountTab({ siteId }: { siteId: string | null }) {
       </div>
 
       {/* Employee tables per department */}
-      {deptList.map((dept: any, deptIdx: number) => {
+      {deptList.map((dept: any) => {
         const deptName = dept.name || dept.department || 'Unassigned';
         const deptEmployees = dept.employees || byDept[deptName] || [];
         if (deptEmployees.length === 0) return null;
 
         return (
-          <div
-            key={`table-${deptName}`}
-            className="glass-card overflow-hidden opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]"
-            style={{ animationDelay: `${(deptList.length + deptIdx) * 60}ms`, animationFillMode: 'backwards' }}
-          >
+          <div key={`table-${deptName}`} className="glass-card overflow-hidden">
             <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-4 dark:border-slate-700/50">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-violet-600">
                 <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" /></svg>
               </div>
               <h3 className="text-sm font-bold font-display text-slate-800 dark:text-slate-200">{deptName}</h3>
-              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-500 dark:bg-slate-700 dark:text-slate-400">{deptEmployees.length}</span>
+              <span className="pill-slate">{deptEmployees.length}</span>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -187,15 +181,14 @@ function HeadcountTab({ siteId }: { siteId: string | null }) {
                   {deptEmployees.map((emp: any, idx: number) => {
                     const name = emp.full_name || emp.name || '--';
                     const typeKey = emp.employment_type || 'full_time';
-                    const typeStyle = EMPLOYMENT_TYPE_STYLES[typeKey] || EMPLOYMENT_TYPE_STYLES.full_time;
+                    const pillClass = EMPLOYMENT_TYPE_PILLS[typeKey] || 'pill-slate';
                     const initials = getInitials(name);
                     const colorIdx = hashStr(name) % INITIAL_COLORS.length;
 
                     return (
                       <tr
                         key={emp.id || idx}
-                        className="group border-b border-slate-50 transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-50/40 hover:to-transparent dark:border-slate-800/50 dark:hover:from-slate-700/30 dark:hover:to-transparent opacity-0 animate-[fadeIn_0.35s_ease-out_forwards]"
-                        style={{ animationDelay: `${idx * 35}ms`, animationFillMode: 'backwards' }}
+                        className="group border-b border-slate-50 transition-colors duration-150 hover:bg-blue-50/30 dark:border-slate-800/50 dark:hover:bg-slate-700/20"
                       >
                         <td className="px-6 py-3.5">
                           <div className="flex items-center gap-3">
@@ -209,8 +202,7 @@ function HeadcountTab({ siteId }: { siteId: string | null }) {
                           {emp.position || emp.job_title || '--'}
                         </td>
                         <td className="px-6 py-3.5">
-                          <span className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold shadow-sm', typeStyle.gradient)}>
-                            <span className={cn('h-1.5 w-1.5 rounded-full', typeStyle.dot)} />
+                          <span className={pillClass}>
                             {typeKey.replace(/_/g, ' ')}
                           </span>
                         </td>
@@ -257,21 +249,20 @@ function PayrollTab({ siteId, year, month }: { siteId: string | null; year: numb
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 stagger-children">
       {/* Gradient summary cards */}
       {summary && (
         <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
           {summaryDefs.map((card, i) => (
             <div
               key={i}
-              className={cn('group relative overflow-hidden rounded-2xl bg-gradient-to-br p-5 text-white shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-xl opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]', card.gradient)}
-              style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'backwards' }}
+              className={cn('gradient-card group relative overflow-hidden rounded-2xl bg-gradient-to-br p-5 text-white shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-xl', card.gradient)}
             >
               <div className="absolute -right-3 -top-3 h-20 w-20 rounded-full bg-white/10 transition-transform duration-500 group-hover:scale-150" />
               <div className="absolute -bottom-4 -left-4 h-16 w-16 rounded-full bg-white/5" />
               <svg className="h-5 w-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={card.icon} /></svg>
               <p className="mt-3 text-[11px] font-semibold uppercase tracking-widest text-white/70">{card.label}</p>
-              <p className="mt-1 text-2xl font-bold font-display tabular-nums font-mono">{card.value}</p>
+              <p className="mt-1 text-2xl font-bold font-display font-mono tabular-nums">{card.value}</p>
             </div>
           ))}
         </div>
@@ -287,9 +278,7 @@ function PayrollTab({ siteId, year, month }: { siteId: string | null; year: numb
             {isConsolidated ? 'By Site' : `By ${t('hr.department')}`}
           </h3>
           {isConsolidated && (
-            <span className="rounded-full bg-gradient-to-r from-amber-100 to-amber-200 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 dark:from-amber-900/40 dark:to-amber-800/40 dark:text-amber-400">
-              FX converted
-            </span>
+            <span className="pill-amber">FX converted</span>
           )}
         </div>
         <div className="overflow-x-auto">
@@ -310,8 +299,7 @@ function PayrollTab({ siteId, year, month }: { siteId: string | null; year: numb
               {departments.map((row: any, idx: number) => (
                 <tr
                   key={row.name || row.site_name || idx}
-                  className="group border-b border-slate-50 transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-transparent dark:border-slate-800/50 dark:hover:from-slate-700/20 dark:hover:to-transparent opacity-0 animate-[fadeIn_0.35s_ease-out_forwards]"
-                  style={{ animationDelay: `${idx * 40}ms`, animationFillMode: 'backwards' }}
+                  className="group border-b border-slate-50 transition-colors duration-150 hover:bg-blue-50/30 dark:border-slate-800/50 dark:hover:bg-slate-700/20"
                 >
                   <td className="px-6 py-4 text-sm font-semibold text-slate-800 dark:text-slate-200">
                     {row.name || row.site_name || row.department || '--'}
@@ -394,7 +382,7 @@ function UploadTab() {
   return (
     <div className="space-y-6">
       <div className="max-w-2xl glass-card overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500 to-violet-600 px-6 py-5">
+        <div className="bg-gradient-to-r from-brand-700 via-brand-600 to-violet-600 px-6 py-5">
           <h3 className="text-lg font-bold font-display text-white">{t('hr.upload')}</h3>
           <p className="mt-1 text-sm text-white/70">
             Upload a CSV file with salary records for a specific site.
@@ -404,11 +392,11 @@ function UploadTab() {
         <div className="p-6 space-y-5">
           {/* Site selector */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('common.site')}</label>
+            <label className="input-label">{t('common.site')}</label>
             <select
               value={selectedSite}
               onChange={(e) => setSelectedSite(e.target.value)}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
+              className="input"
             >
               <option value="">{t('common.selectSite')}</option>
               {sites?.map((site) => (
@@ -419,7 +407,7 @@ function UploadTab() {
 
           {/* Drag-and-drop zone */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">CSV File</label>
+            <label className="input-label">CSV File</label>
             <div
               onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
               onDragLeave={() => setIsDragOver(false)}
@@ -428,20 +416,20 @@ function UploadTab() {
               className={cn(
                 'group relative flex cursor-pointer items-center justify-center rounded-2xl border-2 border-dashed px-6 py-12 transition-all duration-300',
                 isDragOver
-                  ? 'border-blue-500 bg-blue-50/50 scale-[1.01] dark:bg-blue-900/10'
+                  ? 'border-brand-500 bg-brand-50/50 scale-[1.01] dark:bg-brand-900/10'
                   : selectedFile
                     ? 'border-emerald-300 bg-emerald-50/30 dark:border-emerald-700 dark:bg-emerald-900/10'
-                    : 'border-slate-200 bg-slate-50/50 hover:border-blue-400 hover:bg-blue-50/20 dark:border-slate-600 dark:bg-slate-800/30 dark:hover:border-blue-500 dark:hover:bg-blue-900/10'
+                    : 'border-slate-200 bg-slate-50/50 hover:border-brand-400 hover:bg-brand-50/20 dark:border-slate-600 dark:bg-slate-800/30 dark:hover:border-brand-500 dark:hover:bg-brand-900/10'
               )}
             >
               <div className="text-center">
                 <div className={cn(
                   'mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl transition-all duration-300',
                   isDragOver
-                    ? 'bg-gradient-to-br from-blue-500 to-violet-600 scale-110'
+                    ? 'bg-gradient-to-br from-brand-500 to-violet-600 scale-110'
                     : selectedFile
                       ? 'bg-gradient-to-br from-emerald-500 to-teal-600'
-                      : 'bg-gradient-to-br from-slate-200 to-slate-300 group-hover:from-blue-500 group-hover:to-violet-600 dark:from-slate-600 dark:to-slate-700'
+                      : 'bg-gradient-to-br from-slate-200 to-slate-300 group-hover:from-brand-500 group-hover:to-violet-600 dark:from-slate-600 dark:to-slate-700'
                 )}>
                   {selectedFile ? (
                     <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
@@ -473,7 +461,7 @@ function UploadTab() {
             <button
               onClick={handleUpload}
               disabled={!selectedSite || !selectedFile || uploadMutation.isPending}
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-violet-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-blue-500/30 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg"
+              className="btn-primary inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {uploadMutation.isPending ? (
                 <>
@@ -495,7 +483,7 @@ function UploadTab() {
 
             <button
               onClick={handleDownloadTemplate}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:bg-slate-50 hover:shadow dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="btn-ghost inline-flex items-center gap-2"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -558,9 +546,9 @@ export function HRPage() {
   ];
 
   return (
-    <div className="space-y-8 animate-in">
+    <div className="page-enter space-y-8">
       {/* Hero banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-blue-700 to-violet-700 px-8 py-10 shadow-xl shadow-blue-900/20">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-700 via-brand-600 to-violet-600 px-8 py-10 shadow-xl shadow-brand-900/20">
         <div className="absolute -right-10 -top-10 h-60 w-60 rounded-full bg-white/5" />
         <div className="absolute -bottom-8 -left-8 h-40 w-40 rounded-full bg-white/5" />
         <div className="absolute right-20 top-20 h-20 w-20 rounded-full bg-white/5" />
@@ -569,15 +557,15 @@ export function HRPage() {
           <h1 className="text-3xl font-bold tracking-tight text-white font-display lg:text-4xl">
             {t('hr.title') || 'People & Payroll'}
           </h1>
-          <p className="mt-2 text-sm text-blue-100/70">
+          <p className="mt-2 text-sm text-white/60">
             Manage headcount, payroll, and salary data across all sites.
           </p>
 
           <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
             {heroMetrics.map((m, i) => (
               <div key={i} className="rounded-xl bg-white/10 backdrop-blur-sm px-4 py-3 transition-all duration-300 hover:bg-white/15">
-                <p className="text-[11px] font-semibold uppercase tracking-widest text-blue-100/60">{m.label}</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums font-mono text-white">{m.value}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-white/50">{m.label}</p>
+                <p className="mt-1 text-2xl font-bold font-mono tabular-nums text-white">{m.value}</p>
               </div>
             ))}
           </div>
@@ -585,7 +573,7 @@ export function HRPage() {
       </div>
 
       {/* Segmented control tabs */}
-      <div className="inline-flex rounded-xl bg-slate-100/80 p-1 backdrop-blur dark:bg-slate-800/80">
+      <div className="segmented-control">
         {TABS.map((tab) => (
           <button
             key={tab}
@@ -609,11 +597,11 @@ export function HRPage() {
       {activeTab !== 'upload' && (
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('common.site')}</label>
+            <label className="input-label">{t('common.site')}</label>
             <select
               value={siteId || ''}
               onChange={(e) => setSiteId(e.target.value || null)}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
+              className="input"
             >
               <option value="">{t('common.consolidated')}</option>
               {sites?.map((site) => (
@@ -625,22 +613,14 @@ export function HRPage() {
           {activeTab === 'payroll' && (
             <>
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('common.year')}</label>
-                <select
-                  value={selectedYear}
-                  disabled
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
-                >
+                <label className="input-label">{t('common.year')}</label>
+                <select value={selectedYear} disabled className="input">
                   <option>{selectedYear}</option>
                 </select>
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t('common.period')}</label>
-                <select
-                  value={selectedMonth}
-                  disabled
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
-                >
+                <label className="input-label">{t('common.period')}</label>
+                <select value={selectedMonth} disabled className="input">
                   <option>{String(selectedMonth).padStart(2, '0')}</option>
                 </select>
               </div>

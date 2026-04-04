@@ -140,7 +140,7 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full rounded-xl bg-gradient-to-r from-[#1a6fb5] to-[#3a9d6a] py-3.5 text-[14px] font-semibold text-white shadow-lg shadow-[#1a6fb5]/20 transition-all duration-200 hover:shadow-xl hover:shadow-[#1a6fb5]/30 hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
+              className="w-full rounded-xl bg-gradient-to-r from-brand-500 to-accent-400 py-3.5 text-[14px] font-semibold text-white shadow-lg shadow-brand-500/20 transition-all duration-200 hover:shadow-xl hover:shadow-brand-500/30 hover:brightness-110 active:scale-[0.98] disabled:opacity-60"
             >
               {loginMutation.isPending ? (
                 <span className="flex items-center justify-center gap-2">

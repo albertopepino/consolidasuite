@@ -105,9 +105,9 @@ function CashPositionTab({ siteId, date }: { siteId: string | null; date: string
   const totalCash = position.total_cash ?? 0;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 stagger-children">
       {/* Cash position hero */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 px-8 py-10 shadow-xl shadow-emerald-900/20">
+      <div className="gradient-card relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 px-8 py-10 shadow-xl shadow-emerald-900/20">
         <div className="absolute -right-10 -top-10 h-60 w-60 rounded-full bg-white/5" />
         <div className="absolute -bottom-8 -left-8 h-40 w-40 rounded-full bg-white/5" />
         <div className="absolute right-32 bottom-4 h-20 w-20 rounded-full bg-white/5" />
@@ -126,7 +126,7 @@ function CashPositionTab({ siteId, date }: { siteId: string | null; date: string
             ].map((m, i) => (
               <div key={i} className="rounded-xl bg-white/10 backdrop-blur-sm px-4 py-3 transition-all duration-300 hover:bg-white/15">
                 <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-100/60">{m.label}</p>
-                <p className="mt-1 text-xl font-bold tabular-nums font-mono text-white">{formatCompact(m.value)}</p>
+                <p className="mt-1 text-xl font-bold font-mono tabular-nums text-white">{formatCompact(m.value)}</p>
               </div>
             ))}
           </div>
@@ -143,9 +143,7 @@ function CashPositionTab({ siteId, date }: { siteId: string | null; date: string
               <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
             </div>
             <h2 className="text-base font-bold font-display text-slate-900 dark:text-white">{t('treasury.bankAccounts')}</h2>
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-500 dark:bg-slate-700 dark:text-slate-400">
-              {accounts.length}
-            </span>
+            <span className="pill-slate">{accounts.length}</span>
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -158,8 +156,7 @@ function CashPositionTab({ siteId, date }: { siteId: string | null; date: string
               return (
                 <div
                   key={acc.id || idx}
-                  className="group glass-card overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]"
-                  style={{ animationDelay: `${idx * 70}ms`, animationFillMode: 'backwards' }}
+                  className="glass-card group overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
                 >
                   <div className="p-5">
                     <div className="flex items-start justify-between">
@@ -173,10 +170,8 @@ function CashPositionTab({ siteId, date }: { siteId: string | null; date: string
                         </div>
                       </div>
                       <span className={cn(
-                        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase',
-                        isActive
-                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                          : 'bg-slate-500/10 text-slate-500 dark:text-slate-400'
+                        'inline-flex items-center gap-1',
+                        isActive ? 'pill-green' : 'pill-slate'
                       )}>
                         <span className={cn('h-1.5 w-1.5 rounded-full', isActive ? 'bg-emerald-500' : 'bg-slate-400')} />
                         {status}
@@ -190,9 +185,7 @@ function CashPositionTab({ siteId, date }: { siteId: string | null; date: string
                           {formatAmount(acc.balance ?? 0)}
                         </p>
                       </div>
-                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-500 dark:bg-slate-700 dark:text-slate-400">
-                        {currency}
-                      </span>
+                      <span className="pill-slate">{currency}</span>
                     </div>
                   </div>
 
@@ -271,14 +264,14 @@ function DebtProfileTab() {
   const profile = data?.maturity_profile ?? data?.profile ?? {};
 
   const summaryDefs = [
-    { label: t('treasury.totalDebt'), value: profile.total_debt ?? 0, gradient: 'from-red-500 to-rose-600', icon: '\uD83D\uDCC9' },
-    { label: t('treasury.shortTerm'), value: profile.short_term ?? 0, gradient: 'from-amber-500 to-orange-600', icon: '\u23F1\uFE0F' },
-    { label: t('treasury.longTerm'), value: profile.long_term ?? 0, gradient: 'from-blue-500 to-indigo-600', icon: '\uD83D\uDCC5' },
-    { label: t('treasury.avgRate'), value: profile.weighted_avg_rate != null ? `${profile.weighted_avg_rate.toFixed(2)}%` : '-', gradient: 'from-violet-500 to-purple-600', icon: '\uD83D\uDCCA', raw: true },
+    { label: t('treasury.totalDebt'), value: profile.total_debt ?? 0, gradient: 'from-red-500 to-rose-600', icon: 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6' },
+    { label: t('treasury.shortTerm'), value: profile.short_term ?? 0, gradient: 'from-amber-500 to-orange-600', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+    { label: t('treasury.longTerm'), value: profile.long_term ?? 0, gradient: 'from-blue-500 to-indigo-600', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+    { label: t('treasury.avgRate'), value: profile.weighted_avg_rate != null ? `${profile.weighted_avg_rate.toFixed(2)}%` : '-', gradient: 'from-violet-500 to-purple-600', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', raw: true },
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 stagger-children">
       {/* Summary cards */}
       {Object.keys(profile).length > 0 && (
         <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
@@ -286,15 +279,16 @@ function DebtProfileTab() {
             <div
               key={i}
               className={cn(
-                'group relative overflow-hidden rounded-2xl bg-gradient-to-br p-6 text-white shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-xl opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]',
+                'gradient-card group relative overflow-hidden rounded-2xl bg-gradient-to-br p-6 text-white shadow-lg transition-all duration-300 hover:scale-[1.03] hover:shadow-xl',
                 card.gradient
               )}
-              style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'backwards' }}
             >
               <div className="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-white/10 transition-transform duration-500 group-hover:scale-150" />
-              <span className="text-2xl">{card.icon}</span>
+              <svg className="h-6 w-6 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={card.icon} />
+              </svg>
               <p className="mt-3 text-[11px] font-semibold uppercase tracking-widest text-white/70">{card.label}</p>
-              <p className="mt-1 text-2xl font-bold font-display tabular-nums font-mono">
+              <p className="mt-1 text-2xl font-bold font-display font-mono tabular-nums">
                 {card.raw ? card.value : formatAmount(card.value as number)}
               </p>
             </div>
@@ -315,9 +309,7 @@ function DebtProfileTab() {
               <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
             </div>
             <h2 className="text-base font-bold font-display text-slate-900 dark:text-white">{t('treasury.debtInstruments')}</h2>
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-500 dark:bg-slate-700 dark:text-slate-400">
-              {instruments.length}
-            </span>
+            <span className="pill-slate">{instruments.length}</span>
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -326,20 +318,19 @@ function DebtProfileTab() {
               return (
                 <div
                   key={d.id || idx}
-                  className="group glass-card overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]"
-                  style={{ animationDelay: `${idx * 70}ms`, animationFillMode: 'backwards' }}
+                  className="glass-card group overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
                 >
                   <div className="p-5">
                     <div className="flex items-start justify-between">
                       <div>
-                        <span className="inline-flex items-center rounded-full bg-violet-500/10 px-2.5 py-0.5 text-[11px] font-bold uppercase text-violet-600 dark:text-violet-400">
+                        <span className="pill-violet">
                           {d.instrument_type || d.type || '-'}
                         </span>
                         <h3 className="mt-2 text-sm font-bold text-slate-800 dark:text-slate-200">{d.lender || d.bank || '-'}</h3>
                       </div>
                       {rate != null && (
                         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/20">
-                          <span className="text-sm font-bold text-white">{rate}%</span>
+                          <span className="text-sm font-bold font-mono tabular-nums text-white">{rate}%</span>
                         </div>
                       )}
                     </div>
@@ -404,7 +395,7 @@ export function TreasuryPage() {
   ];
 
   return (
-    <div className="space-y-8 animate-in">
+    <div className="page-enter space-y-8">
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight font-display text-slate-900 dark:text-white">
@@ -414,7 +405,7 @@ export function TreasuryPage() {
       </div>
 
       {/* Segmented control tabs */}
-      <div className="inline-flex rounded-xl bg-slate-100/80 p-1 backdrop-blur dark:bg-slate-800/80">
+      <div className="segmented-control">
         {TAB_DEFS.map((tab) => (
           <button
             key={tab.key}

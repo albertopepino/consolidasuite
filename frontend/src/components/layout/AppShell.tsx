@@ -8,8 +8,8 @@ export function AppShell() {
       <Sidebar />
       <div className="flex flex-1 flex-col min-w-0">
         <Header />
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8 scrollbar-thin">
-          <div className="mx-auto max-w-[1600px]">
+        <main className="flex-1 overflow-y-auto scrollbar-thin">
+          <div className="mx-auto max-w-[1440px] p-6 lg:p-8">
             <Outlet />
           </div>
         </main>

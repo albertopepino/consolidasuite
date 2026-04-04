@@ -1,17 +1,15 @@
 import { useDashboardStore } from '@/store/dashboardStore';
 import { useUploadHistory } from '@/api/hooks';
 import { UploadForm } from '@/components/upload/UploadForm';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { formatDateTime } from '@/utils/formatters';
 import { useTranslation } from '@/i18n/useTranslation';
 
-const STATUS_VARIANT: Record<string, 'positive' | 'negative' | 'neutral' | 'warning' | 'info'> = {
-  validated: 'positive',
-  approved: 'positive',
-  pending: 'warning',
-  rejected: 'negative',
+const STATUS_PILL: Record<string, string> = {
+  validated: 'pill-green',
+  approved: 'pill-green',
+  pending: 'pill-amber',
+  rejected: 'pill-red',
 };
 
 const STATEMENT_LABELS: Record<string, string> = {
@@ -26,7 +24,7 @@ export function UploadPage() {
   const { data: history, isLoading: historyLoading } = useUploadHistory(selectedSiteId || '');
 
   return (
-    <div className="space-y-8 animate-in">
+    <div className="page-enter space-y-8">
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight font-display text-slate-900 dark:text-white">
@@ -37,10 +35,10 @@ export function UploadPage() {
         </p>
       </div>
 
-      {/* Upload form */}
-      <Card padding="lg">
+      {/* Upload form in glass-card */}
+      <div className="glass-card p-6">
         <UploadForm />
-      </Card>
+      </div>
 
       {/* Upload history */}
       <div>
@@ -51,7 +49,7 @@ export function UploadPage() {
         {historyLoading ? (
           <LoadingSpinner label="Loading history..." />
         ) : !history || history.items.length === 0 ? (
-          <Card padding="lg">
+          <div className="glass-card border-dashed">
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <svg className="h-12 w-12 text-slate-300 dark:text-slate-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -61,35 +59,35 @@ export function UploadPage() {
                 No uploads yet. Upload your first financial statement above.
               </p>
             </div>
-          </Card>
+          </div>
         ) : (
           <div className="glass-card overflow-hidden">
-            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+            <table className="min-w-full divide-y divide-slate-200/50 dark:divide-slate-700/50">
               <thead>
-                <tr className="bg-slate-50 dark:bg-slate-900">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <tr className="bg-slate-50/50 dark:bg-slate-900/50">
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
                     Statement Type
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
                     Period
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
                     Status
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
                     Uploaded By
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
                     Uploaded At
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
                     Items
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+              <tbody className="divide-y divide-slate-100/50 dark:divide-slate-700/30">
                 {history.items.map((stmt) => (
-                  <tr key={stmt.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30">
+                  <tr key={stmt.id} className="transition-colors hover:bg-slate-50/60 dark:hover:bg-slate-700/20">
                     <td className="px-4 py-3 text-sm text-slate-700 dark:text-slate-300">
                       {STATEMENT_LABELS[stmt.statementType] || stmt.statementType}
                     </td>
@@ -97,9 +95,10 @@ export function UploadPage() {
                       {stmt.period.label}
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant={STATUS_VARIANT[stmt.status] || 'neutral'}>
+                      <span className={STATUS_PILL[stmt.status] || 'pill-slate'}>
+                        <span className="dot" />
                         {stmt.status}
-                      </Badge>
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
                       {stmt.uploadedBy}
@@ -107,7 +106,7 @@ export function UploadPage() {
                     <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
                       {formatDateTime(stmt.uploadedAt)}
                     </td>
-                    <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 tabular-nums">
+                    <td className="px-4 py-3 text-sm font-mono tabular-nums text-slate-500 dark:text-slate-400">
                       {stmt.lineItems.length}
                     </td>
                   </tr>

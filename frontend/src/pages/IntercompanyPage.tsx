@@ -6,15 +6,15 @@ import { useTranslation } from '@/i18n/useTranslation';
 
 type ICTab = 'invoices' | 'reconciliation' | 'loans';
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  approved: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  rejected: 'bg-red-500/10 text-red-600 dark:text-red-400',
-  matched: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  unmatched: 'bg-red-500/10 text-red-600 dark:text-red-400',
-  partial: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  active: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-  matured: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
+const STATUS_PILLS: Record<string, string> = {
+  pending: 'pill-amber',
+  approved: 'pill-green',
+  rejected: 'pill-red',
+  matched: 'pill-green',
+  unmatched: 'pill-red',
+  partial: 'pill-amber',
+  active: 'pill-blue',
+  matured: 'pill-slate',
 };
 
 const DOT_COLORS: Record<string, string> = {
@@ -30,9 +30,11 @@ const DOT_COLORS: Record<string, string> = {
 
 function StatusBadge({ status }: { status: string }) {
   const s = status.toLowerCase();
+  const pill = STATUS_PILLS[s] || 'pill-slate';
+  const dot = DOT_COLORS[s] || 'bg-slate-400';
   return (
-    <span className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold', STATUS_COLORS[s] || STATUS_COLORS.pending)}>
-      <span className={cn('h-1.5 w-1.5 rounded-full', DOT_COLORS[s] || DOT_COLORS.pending)} />
+    <span className={cn(pill, 'inline-flex items-center gap-1.5')}>
+      <span className={cn('h-1.5 w-1.5 rounded-full', dot)} />
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
@@ -70,6 +72,7 @@ function formatAmount(val: number): string {
   return new Intl.NumberFormat('en', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
 }
 
+
 function InvoicesTab({ siteId }: { siteId: string | null }) {
   const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState<string>('');
@@ -80,13 +83,13 @@ function InvoicesTab({ siteId }: { siteId: string | null }) {
   if (items.length === 0) return <EmptyState message={t('common.noData')} />;
 
   return (
-    <div className="glass-card overflow-hidden animate-in">
+    <div className="glass-card overflow-hidden">
       <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
         <h2 className="text-lg font-bold font-display text-slate-900 dark:text-white">{t('ic.invoices')}</h2>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-slate-200/60 bg-white/80 px-3 py-1.5 text-sm dark:border-slate-700/40 dark:bg-slate-800/60 dark:text-slate-200"
+          className="input max-w-[180px]"
         >
           <option value="">{t('common.allStatuses')}</option>
           <option value="pending">{t('ic.pending')}</option>
@@ -108,7 +111,7 @@ function InvoicesTab({ siteId }: { siteId: string | null }) {
           </thead>
           <tbody>
             {items.map((inv: any, idx: number) => (
-              <tr key={inv.id || idx} className="border-b border-slate-100/40 hover:bg-blue-50/30 dark:border-slate-700/20 dark:hover:bg-slate-700/20 transition-colors duration-150 opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]" style={{ animationDelay: `${idx * 40}ms`, animationFillMode: 'backwards' }}>
+              <tr key={inv.id || idx} className="border-b border-slate-100/40 transition-colors duration-150 hover:bg-blue-50/30 dark:border-slate-700/20 dark:hover:bg-slate-700/20">
                 <td className="px-6 py-3 text-sm text-slate-700 dark:text-slate-300">{inv.sender_name || inv.sender_site_id}</td>
                 <td className="px-6 py-3 text-sm text-slate-700 dark:text-slate-300">{inv.receiver_name || inv.receiver_site_id}</td>
                 <td className="px-6 py-3 text-sm text-right font-mono tabular-nums text-slate-700 dark:text-slate-300">{formatAmount(inv.amount)}</td>
@@ -133,7 +136,7 @@ function ReconciliationTab({ year, month }: { year: number; month: number }) {
   if (pairs.length === 0) return <EmptyState message={t('common.noData')} />;
 
   return (
-    <div className="glass-card overflow-hidden animate-in">
+    <div className="glass-card overflow-hidden">
       <div className="border-b border-white/10 px-6 py-4">
         <h2 className="text-lg font-bold font-display text-slate-900 dark:text-white">{t('ic.reconciliation')}</h2>
         <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{year}-{String(month).padStart(2, '0')}</p>
@@ -153,8 +156,18 @@ function ReconciliationTab({ year, month }: { year: number; month: number }) {
           <tbody>
             {pairs.map((pair: any, idx: number) => {
               const diff = (pair.sender_amount ?? 0) - (pair.receiver_amount ?? 0);
+              const isMatched = Math.abs(diff) < 0.01;
+              const status = pair.status || (isMatched ? 'matched' : 'unmatched');
               return (
-                <tr key={pair.id || idx} className="border-b border-slate-100/40 hover:bg-blue-50/30 dark:border-slate-700/20 dark:hover:bg-slate-700/20 transition-colors duration-150 opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]" style={{ animationDelay: `${idx * 40}ms`, animationFillMode: 'backwards' }}>
+                <tr
+                  key={pair.id || idx}
+                  className={cn(
+                    'border-b transition-colors duration-150',
+                    isMatched
+                      ? 'bg-emerald-50/30 border-emerald-100/40 hover:bg-emerald-50/50 dark:bg-emerald-900/5 dark:border-emerald-900/20 dark:hover:bg-emerald-900/10'
+                      : 'bg-red-50/20 border-red-100/40 hover:bg-red-50/40 dark:bg-red-900/5 dark:border-red-900/20 dark:hover:bg-red-900/10'
+                  )}
+                >
                   <td className="px-6 py-3 text-sm text-slate-700 dark:text-slate-300">{pair.sender_name || pair.sender_site_id}</td>
                   <td className="px-6 py-3 text-sm text-slate-700 dark:text-slate-300">{pair.receiver_name || pair.receiver_site_id}</td>
                   <td className="px-6 py-3 text-sm text-right font-mono tabular-nums text-slate-700 dark:text-slate-300">{formatAmount(pair.sender_amount ?? 0)}</td>
@@ -162,7 +175,7 @@ function ReconciliationTab({ year, month }: { year: number; month: number }) {
                   <td className={cn('px-6 py-3 text-sm text-right font-mono tabular-nums', Math.abs(diff) > 0.01 ? 'text-red-500 dark:text-red-400 font-semibold' : 'text-emerald-600 dark:text-emerald-400')}>
                     {formatAmount(diff)}
                   </td>
-                  <td className="px-6 py-3"><StatusBadge status={pair.status || (Math.abs(diff) < 0.01 ? 'matched' : 'unmatched')} /></td>
+                  <td className="px-6 py-3"><StatusBadge status={status} /></td>
                 </tr>
               );
             })}
@@ -182,7 +195,7 @@ function LoansTab() {
   if (items.length === 0) return <EmptyState message={t('common.noData')} />;
 
   return (
-    <div className="glass-card overflow-hidden animate-in">
+    <div className="glass-card overflow-hidden">
       <div className="border-b border-white/10 px-6 py-4">
         <h2 className="text-lg font-bold font-display text-slate-900 dark:text-white">{t('ic.loans')}</h2>
       </div>
@@ -200,7 +213,7 @@ function LoansTab() {
           </thead>
           <tbody>
             {items.map((loan: any, idx: number) => (
-              <tr key={loan.id || idx} className="border-b border-slate-100/40 hover:bg-blue-50/30 dark:border-slate-700/20 dark:hover:bg-slate-700/20 transition-colors duration-150 opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]" style={{ animationDelay: `${idx * 40}ms`, animationFillMode: 'backwards' }}>
+              <tr key={loan.id || idx} className="border-b border-slate-100/40 transition-colors duration-150 hover:bg-blue-50/30 dark:border-slate-700/20 dark:hover:bg-slate-700/20">
                 <td className="px-6 py-3 text-sm text-slate-700 dark:text-slate-300">{loan.lender_name || loan.lender_site_id}</td>
                 <td className="px-6 py-3 text-sm text-slate-700 dark:text-slate-300">{loan.borrower_name || loan.borrower_site_id}</td>
                 <td className="px-6 py-3 text-sm text-right font-mono tabular-nums text-slate-700 dark:text-slate-300">{formatAmount(loan.principal_amount ?? loan.amount ?? 0)}</td>
@@ -236,7 +249,7 @@ export function IntercompanyPage() {
   ];
 
   return (
-    <div className="space-y-6 animate-in">
+    <div className="page-enter space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight font-display text-slate-900 dark:text-white">
           {t('ic.title')}
@@ -246,16 +259,16 @@ export function IntercompanyPage() {
         </p>
       </div>
 
-      <div className="flex gap-2">
+      <div className="segmented-control">
         {TAB_DEFS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              'inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200',
+              'inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-all duration-200',
               activeTab === tab.key
-                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                : 'glass-card !rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
             )}
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
