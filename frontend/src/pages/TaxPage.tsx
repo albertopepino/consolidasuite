@@ -58,8 +58,10 @@ function EmptyState({ message }: { message: string }) {
   );
 }
 
-function formatPercent(val: number): string {
-  return `${val.toFixed(1)}%`;
+function formatPercent(val: number | string): string {
+  const n = typeof val === 'string' ? parseFloat(val) : val;
+  if (isNaN(n)) return '-';
+  return `${(n * 100).toFixed(1)}%`;
 }
 
 function isOverdue(dateStr: string): boolean {
