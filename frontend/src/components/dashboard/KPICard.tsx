@@ -13,13 +13,14 @@ const COLOR_MAP: Record<string, {
   icon: string;
   accent: string;
   glow: string;
+  ring: string;
 }> = {
-  blue:    { bg: 'bg-blue-500/10',    icon: 'text-blue-500',    accent: 'from-blue-500 to-blue-600',    glow: 'shadow-blue-500/20' },
-  emerald: { bg: 'bg-emerald-500/10', icon: 'text-emerald-500', accent: 'from-emerald-500 to-emerald-600', glow: 'shadow-emerald-500/20' },
-  violet:  { bg: 'bg-violet-500/10',  icon: 'text-violet-500',  accent: 'from-violet-500 to-violet-600',  glow: 'shadow-violet-500/20' },
-  pink:    { bg: 'bg-pink-500/10',    icon: 'text-pink-500',    accent: 'from-pink-500 to-pink-600',    glow: 'shadow-pink-500/20' },
-  cyan:    { bg: 'bg-cyan-500/10',    icon: 'text-cyan-500',    accent: 'from-cyan-500 to-cyan-600',    glow: 'shadow-cyan-500/20' },
-  amber:   { bg: 'bg-amber-500/10',   icon: 'text-amber-500',   accent: 'from-amber-500 to-amber-600',   glow: 'shadow-amber-500/20' },
+  blue:    { bg: 'bg-blue-500/10',    icon: 'text-blue-500',    accent: 'from-blue-500 to-blue-600',    glow: 'shadow-blue-500/20',    ring: 'ring-blue-500/20' },
+  emerald: { bg: 'bg-emerald-500/10', icon: 'text-emerald-500', accent: 'from-emerald-500 to-emerald-600', glow: 'shadow-emerald-500/20', ring: 'ring-emerald-500/20' },
+  violet:  { bg: 'bg-violet-500/10',  icon: 'text-violet-500',  accent: 'from-violet-500 to-violet-600',  glow: 'shadow-violet-500/20',  ring: 'ring-violet-500/20' },
+  pink:    { bg: 'bg-pink-500/10',    icon: 'text-pink-500',    accent: 'from-pink-500 to-pink-600',    glow: 'shadow-pink-500/20',    ring: 'ring-pink-500/20' },
+  cyan:    { bg: 'bg-cyan-500/10',    icon: 'text-cyan-500',    accent: 'from-cyan-500 to-cyan-600',    glow: 'shadow-cyan-500/20',    ring: 'ring-cyan-500/20' },
+  amber:   { bg: 'bg-amber-500/10',   icon: 'text-amber-500',   accent: 'from-amber-500 to-amber-600',   glow: 'shadow-amber-500/20',   ring: 'ring-amber-500/20' },
 };
 
 export function KPICard({ data, className, index = 0 }: KPICardProps) {
@@ -31,11 +32,12 @@ export function KPICard({ data, className, index = 0 }: KPICardProps) {
     <div
       className={cn(
         'group relative overflow-hidden glass-card p-5',
-        'hover:scale-[1.02] hover:shadow-card-hover',
+        'transition-all duration-300 hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-card-hover',
+        'opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]',
         className
       )}
       style={{
-        animationDelay: `${index * 50}ms`,
+        animationDelay: `${index * 60}ms`,
         animationFillMode: 'backwards',
       }}
     >
@@ -45,19 +47,27 @@ export function KPICard({ data, className, index = 0 }: KPICardProps) {
         colors.accent
       )} />
 
-      <div className="flex items-start gap-4 pl-2">
-        {/* Icon in gradient circle */}
+      {/* Subtle decorative glow in corner */}
+      <div className={cn(
+        'pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-30 blur-2xl transition-opacity duration-500 group-hover:opacity-50',
+        colors.bg
+      )} />
+
+      <div className="relative flex items-start gap-4 pl-2">
+        {/* Icon in colored circle */}
         <div className={cn(
-          'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl',
+          'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ring-1',
           colors.bg,
-          'transition-transform duration-200 group-hover:scale-110',
+          colors.ring,
+          'transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg',
+          colors.glow,
         )}>
           <KPIIcon type={icon || 'ratio'} className={cn('h-5 w-5', colors.icon)} />
         </div>
 
         {/* Content */}
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400 dark:text-slate-500">
             {label}
           </p>
           <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white font-display">
@@ -68,7 +78,7 @@ export function KPICard({ data, className, index = 0 }: KPICardProps) {
 
       {/* Bottom info */}
       {benchmark !== undefined && (
-        <div className="mt-3 ml-2 flex items-center gap-2 border-t border-slate-100/60 pt-3 dark:border-slate-700/30">
+        <div className="relative mt-3 ml-2 flex items-center gap-2 border-t border-slate-100/60 pt-3 dark:border-slate-700/30">
           <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
             {t('kpi.benchmark')}: {benchmark.toFixed(1)}
           </span>
